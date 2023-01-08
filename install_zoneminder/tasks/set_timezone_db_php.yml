@@ -1,0 +1,25 @@
+---
+- name      : Set timezone DB & php
+  block     :
+  - name    : Update timezone info
+    tags    : [ timezone-update ]
+    apt     :
+      name  : tzdata
+      state : latest
+      install_recommends: no
+    register: timezone_info
+
+  - name    : Move system timezone info into MariaDB
+    tags    : [ timezone-update ]
+    shell   : >
+      mysql_tzinfo_to_sql /usr/share/zoneinfo \
+        | grep -v "^Warning" \
+        | mysql --database=mysql
+    when    : timezone_info.changed
+
+  - name    : Change php timezone
+    ansible.builtin.lineinfile:
+      path  : /etc/php/7.4/apache2/php.ini
+      regexp: '^;date.timezone ='
+      line  : date.timezone = Asia/Yekaterinburg
+    notify  : Restart apache

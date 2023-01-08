@@ -1,0 +1,9 @@
+---
+# defaults file for install_docker_and_s3fs
+
+# ACCESS_KEY: 
+# SECRET_KEY: 
+
+# buckets:
+#   - name-bucket-one
+#   - name-bucket-two

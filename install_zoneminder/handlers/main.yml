@@ -1,0 +1,13 @@
+---
+# handlers file for install_zoneminder
+- name : Enable zoneminder services
+  shell: systemctl enable zoneminder.service
+
+- name : Enable apache conf zoneminder
+  shell: a2enconf zoneminder
+
+- name : Enable apache mod rewrite headers expires
+  shell: a2enmod rewrite headers expires
+
+- name : Restart apache
+  shell: service apache2 reload

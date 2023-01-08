@@ -1,0 +1,23 @@
+- name     : Copy generated configuration file passwd-s3fs
+  template :
+    src    : ./files/passwd-s3fs.j2
+    dest   : /etc/passwd-s3fs
+    mode   : '0600'
+
+- name: Configure fstab
+  ansible.builtin.lineinfile:
+    path   : /etc/fstab
+    line   : "{{ item }} /mnt/{{ item }} fuse.s3fs _netdev,allow_other,use_path_request_style,url=https://storage.yandexcloud.net,uid=www-data,gid=www-data,umask=077 0 0"
+    create : yes
+  register: fstab
+  with_items: "{{ buckets }}"
+
+- name: Create a directory if it does not exist
+  ansible.builtin.file:
+    path: /mnt/{{ item }}
+    state: directory
+  with_items: "{{ buckets }}"
+
+- name: Remount a mounted volume
+  command: "mount -a"
+  when: fstab.changed

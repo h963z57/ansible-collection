@@ -1,0 +1,11 @@
+---
+- name: Install zoneminder
+  apt:
+    pkg:
+        - zoneminder
+    state: latest
+  notify:
+    - Enable zoneminder services
+    - Enable apache conf zoneminder
+    - Enable apache mod rewrite headers expires
+    - Restart apache

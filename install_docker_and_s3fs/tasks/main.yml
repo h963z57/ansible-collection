@@ -1,0 +1,7 @@
+---
+# tasks file for install_docker_and_s3fs
+- name         : Install docker
+  include_tasks: setup.yaml
+
+- name         : Configure s3fs
+  include_tasks: configure_s3fs.yaml

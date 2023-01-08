@@ -1,0 +1,13 @@
+---
+# tasks file for install_zoneminder
+- name         : Install zoneminder depends
+  include_tasks: install_zoneminder_depends.yml
+  
+- name         : Install zoneminder repo
+  include_tasks: install_zoneminder_repo.yml
+  
+- name         : Install zoneminder
+  include_tasks: install_zoneminder.yml
+  
+- name         : Set timezone MariaDB & PHP 7.4
+  include_tasks: set_timezone_db_php.yml

@@ -1,0 +1,17 @@
+---
+- name         : Install zoneminder repository
+  block        :
+    
+    - name     : Install repository of zoneminder
+      ansible.builtin.lineinfile:
+        path   : /etc/apt/sources.list.d/zoneminder.list
+        line   : deb https://zmrepo.zoneminder.com/debian/release-1.36 {{ ansible_distribution_release }}/
+        create : yes
+
+    - name     : Add an Apt signing key, uses whichever key is at the URL
+      ansible.builtin.apt_key:
+        url    : https://zmrepo.zoneminder.com/debian/archive-keyring.gpg
+        state  : present
+    
+    - name     : Update repository
+      shell    : apt update
