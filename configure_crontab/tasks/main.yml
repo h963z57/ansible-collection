@@ -1,0 +1,7 @@
+---
+# tasks file for configure_crontab
+- name         : copy script files
+  include_tasks: copy_script_files.yaml
+
+- name         : configure crontab
+  include_tasks: configure_crontab.yaml

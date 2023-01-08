@@ -1,0 +1,6 @@
+- name: copy script files
+  copy:
+    src: ./files/{{ item }}
+    dest: $h/scripts/
+    mode: 0555
+  with_items: "{{ CRONTAB_SCRIPTS }}"

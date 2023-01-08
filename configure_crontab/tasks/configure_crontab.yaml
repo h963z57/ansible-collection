@@ -1,0 +1,12 @@
+- name      : Configure crontab
+  ansible.builtin.cron:
+    name    : "{{ item.name }}"
+    month   : "{{ item.month }}"
+    weekday : "{{ item.weekday }}"
+    day     : "{{ item.day }}"
+    hour    : "{{ item.hour }}"
+    minute  : "{{ item.minute }}"
+    user    : "{{ item.user }}"
+    job     : "{{ item.job }}"
+    disabled: "{{ item.disabled }}"
+  with_items: "{{ CRONTAB_JOBS }}"
