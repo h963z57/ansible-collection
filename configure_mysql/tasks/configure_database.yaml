@@ -1,27 +1,26 @@
 - name            : Removes all anonymous user accounts
-    community.mysql.mysql_user:
-      login_user    : "{{ MYSQL_ROOT_LOGIN }}"
-      login_password: "{{ MYSQL_ROOT_PASSWORD }}"
-      name          : ''
-      host_all      : yes
-      state         : absent
+  community.mysql.mysql_user:
+    login_user    : "{{ MYSQL_ROOT_LOGIN }}"
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    name          : ''
+    host_all      : yes
+    state         : absent
 
+- name            : Create a new databases
+  community.mysql.mysql_db:
+    login_user    : "{{ MYSQL_ROOT_LOGIN }}"
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    name          : "{{ item.user }}"
+    state         : "{{ DBS_STATE }}"
+  with_items      : "{{ DBS_CRED }}"
 
-  - name            : Create a new databases
-    community.mysql.mysql_db:
-      login_user    : "{{ MYSQL_ROOT_LOGIN }}"
-      login_password: "{{ MYSQL_ROOT_PASSWORD }}"
-      name          : "{{ item.user }}"
-      state         : "{{ DBS_STATE }}"
-    with_items      : "{{ DBS_CRED }}"
-
-  - name            : Create user with priv to database with same name
-    community.mysql.mysql_user:
-      host          : "%"
-      login_user    : "{{ MYSQL_ROOT_LOGIN }}"
-      login_password: "{{ MYSQL_ROOT_PASSWORD }}"
-      name          : "{{ item.user }}"
-      password      : "{{ item.password }}"
-      priv          : '{{ item.user }}.*: ALL,GRANT'
-      state         : "{{ DBS_STATE }}"
-    with_items      : "{{ DBS_CRED }}"
+- name            : Create user with priv to database with same name
+  community.mysql.mysql_user:
+    host          : "%"
+    login_user    : "{{ MYSQL_ROOT_LOGIN }}"
+    login_password: "{{ MYSQL_ROOT_PASSWORD }}"
+    name          : "{{ item.user }}"
+    password      : "{{ item.password }}"
+    priv          : '{{ item.user }}.*: ALL,GRANT'
+    state         : "{{ DBS_STATE }}"
+  with_items      : "{{ DBS_CRED }}"
