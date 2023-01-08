@@ -1,0 +1,11 @@
+---
+# defaults file for configure_mysql
+
+# MYSQL_ROOT_LOGIN   : login
+# MYSQL_ROOT_PASSWORD: password
+
+# DBS_CRED:
+#   - { user: first,   password: first_pass }
+#   - { user: second,  password: second_pass }
+#   ...
+# DBS_STATE: present

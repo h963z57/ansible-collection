@@ -1,0 +1,7 @@
+---
+# tasks file for configure_mysql
+- name         : install packages
+  include_tasks: install_packages.yaml
+
+- name         : configure mysql database
+  include_tasks: configure_database.yaml
