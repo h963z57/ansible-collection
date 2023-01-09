@@ -11,7 +11,7 @@
     login_user    : "{{ MYSQL_ROOT_LOGIN }}"
     login_password: "{{ MYSQL_ROOT_PASSWORD }}"
     name          : "{{ item.user }}"
-    state         : "{{ DBS_STATE }}"
+    state         : "{{ item.state }}"
   with_items      : "{{ DBS_CRED }}"
 
 - name            : Create user with priv to database with same name
@@ -22,5 +22,5 @@
     name          : "{{ item.user }}"
     password      : "{{ item.password }}"
     priv          : '{{ item.user }}.*: ALL,GRANT'
-    state         : "{{ DBS_STATE }}"
+    state         : "{{ item.state }}"
   with_items      : "{{ DBS_CRED }}"
