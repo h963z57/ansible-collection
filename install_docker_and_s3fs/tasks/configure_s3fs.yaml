@@ -7,15 +7,15 @@
 - name: Configure fstab
   ansible.builtin.lineinfile:
     path   : /etc/fstab
-    line   : "{{ item }} /mnt/{{ item }} fuse.s3fs _netdev,allow_other,use_path_request_style,url=https://storage.yandexcloud.net,uid=www-data,gid=www-data,umask=077 0 0"
+    line   : "{{ item.name }} /mnt/{{ item.name }} fuse.s3fs _netdev,allow_other,use_path_request_style,url=https://storage.yandexcloud.net,uid=www-data,gid=www-data,umask=077 0 0"
     create : yes
-    state  : "{{ S3FS_STATE }}"
+    state  : "{{ item.state}}"
   register: fstab
   with_items: "{{ buckets }}"
 
 - name: Create a directory if it does not exist
   ansible.builtin.file:
-    path: /mnt/{{ item }}
+    path: /mnt/{{ item.name }}
     state: directory
   with_items: "{{ buckets }}"
 
