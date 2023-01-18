@@ -7,7 +7,7 @@
 - name: Configure fstab
   ansible.builtin.lineinfile:
     path   : /etc/fstab
-    line   : "{{ item.name }} /mnt/{{ item.name }} fuse.s3fs _netdev,allow_other,use_path_request_style,url=https://storage.yandexcloud.net,uid=www-data,gid=www-data,umask=077 0 0"
+    line   : "{{ item.name }} /mnt/{{ item.name }} fuse.s3fs _netdev,allow_other,use_path_request_style,url=https://storage.yandexcloud.net,uid={{ item.uid }},gid={{ item.gid }},umask=077 0 0"
     create : yes
     state  : "{{ item.state}}"
   register: fstab

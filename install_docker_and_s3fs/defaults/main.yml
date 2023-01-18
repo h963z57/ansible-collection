@@ -5,5 +5,4 @@
 # SECRET_KEY: <secret>
 
 # buckets:
-#   - { name: first, state: present }
-#   - { name: second, state: present }
+#   - { name: first, uid: name, gid: group, state: present }
