@@ -25,12 +25,12 @@
       - docker
       - docker.io
       - docker-registry
-      - s3fs
+      #- s3fs
     state: latest
     update_cache: true
 
-- name: Install docker-compose from github
-  ansible.builtin.get_url:
-    url: https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-linux-x86_64
-    dest: /usr/bin/docker-compose
-    mode: '+x'
+# - name: Install docker-compose from github
+#   ansible.builtin.get_url:
+#     url: https://github.com/docker/compose/releases/download/v2.15.1/docker-compose-linux-x86_64
+#     dest: /usr/bin/docker-compose
+#     mode: '+x'
