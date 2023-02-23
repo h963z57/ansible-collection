@@ -1,0 +1,36 @@
+---
+- name     : Set hostname
+  ansible.builtin.hostname:
+    name: "{{ HOSTNAME }}"
+  notify   : Reboot
+  when     : HOSTNAME is defined
+
+- name     : Set timezone
+  community.general.timezone:
+    name   : "{{ TIMEZONE }}"
+
+- name      : Create user or destroy user
+  ansible.builtin.user:
+    name    : "{{ item.user }}"
+    password: "{{ item.password  | password_hash('sha512') }}"
+    force   : "{{ item.force }}"
+    remove  : "{{ item.remove }}"
+    state   : "{{ item.state }}"
+  with_items: "{{ USERS_WITH_SSH }}"
+
+- name: Set authorized key taken from file
+  authorized_key:
+    user : "{{ item.user }}"
+    state: "{{ item.state }}"
+    key: "{{ lookup('file', './files/secrets/ssh-keys/{{ item.file }}') }}"
+  when      : item.state == "present"
+  with_items: "{{ USERS_WITH_SSH }}"
+  notify    : Restart sshd service
+
+- name: Add users to sudo
+  ansible.builtin.lineinfile:
+    path: "/etc/sudoers.d/{{ item.user }}"
+    line: "{{ item.user }}  ALL=(ALL)  NOPASSWD: ALL"
+    create: yes
+    state: "{{ item.sudo }}"
+  with_items: "{{ USERS_WITH_SSH }}"

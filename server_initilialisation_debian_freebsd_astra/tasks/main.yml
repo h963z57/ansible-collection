@@ -1,0 +1,14 @@
+---
+# tasks file for server_initilialisation_debian_freebsd
+- name         : Configure base options
+  include_tasks: configure_base_options.yml
+
+- name         : Configure sshd config
+  include_tasks: configure_sshd_config.yml
+
+- name         : Install python3-apt
+  apt          :
+    pkg        :
+        - python3-apt
+    state: latest
+  when: ansible_system == 'Linux'

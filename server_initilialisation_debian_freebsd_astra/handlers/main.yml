@@ -1,0 +1,7 @@
+---
+# handlers file for server_initilialisation_debian_freebsd
+- name: Restart sshd service
+  service : name=sshd state=restarted enabled=yes
+
+- name: Reboot
+  ansible.builtin.reboot:

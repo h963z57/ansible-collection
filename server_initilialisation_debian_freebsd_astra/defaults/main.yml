@@ -1,0 +1,9 @@
+---
+# defaults file for server_initilialisation_debian_freebsd
+
+# HOSTNAME: test # May be empty
+# TIMEZONE: Europe/Moscow
+
+# USERS_WITH_SSH:
+#   - {user: user1, password: pass1, force: false, remove: false, sudo: present, state: present, file: test.pub}
+#   - {user: user2, password: pass2, force: false, remove: false, sudo: present, state: present, file: test.pub}

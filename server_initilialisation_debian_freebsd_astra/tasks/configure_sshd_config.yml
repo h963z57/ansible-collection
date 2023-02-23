@@ -1,0 +1,51 @@
+---
+- name     : Add RSAAuthentication yes
+  ansible.builtin.lineinfile:
+    path   : /etc/ssh/sshd_config
+    line   : RSAAuthentication yes
+    create : yes
+  notify   : Restart sshd service
+  when     : ansible_system == 'Linux'
+
+# - name     : '#PubkeyAuthentication yes -> PubkeyAuthentication yes'
+#   ansible.builtin.lineinfile:
+#     path   : /etc/ssh/sshd_config
+#     regexp : '^#PubkeyAuthentication yes'
+#     line   : PubkeyAuthentication yes
+#   notify   : Restart sshd service
+
+# - name     : '#AuthorizedKeysFile     .ssh/authorized_keys -> AuthorizedKeysFile      %h/.ssh/authorized_keys'
+#   ansible.builtin.lineinfile:
+#     path   : /etc/ssh/sshd_config
+#     regexp : '^#AuthorizedKeysFile     .ssh/authorized_keys'
+#     line   : AuthorizedKeysFile      %h/.ssh/authorized_keys
+#   notify   : Restart sshd service
+
+# - name     : '# HostbasedAuthentication -> HostbasedAuthentication no'
+#   ansible.builtin.lineinfile:
+#     path   : /etc/ssh/sshd_config
+#     regexp : '^# HostbasedAuthentication'
+#     line   : HostbasedAuthentication no
+#   notify   : Restart sshd service
+
+# - name     : '#PermitEmptyPasswords no -> PermitEmptyPasswords no'
+#   ansible.builtin.lineinfile:
+#     path   : /etc/ssh/sshd_config
+#     regexp : '^#PermitEmptyPasswords no'
+#     line   : PermitEmptyPasswords no
+#   notify   : Restart sshd service
+
+- name     : '#PasswordAuthentication yes -> PasswordAuthentication no'
+  ansible.builtin.lineinfile:
+    path   : /etc/ssh/sshd_config
+    regexp : '^#PasswordAuthentication yes'
+    line   : PasswordAuthentication no
+  notify   : Restart sshd service
+
+# - name     : '#PermitRootLogin no -> PermitRootLogin yes'
+#   ansible.builtin.lineinfile:
+#     path   : /etc/ssh/sshd_config
+#     regexp : '^#PermitRootLogin no'
+#     line   : PermitRootLogin yes
+#   notify   : Restart sshd service
+#   when     : ansible_os_family == "FreeBSD"
