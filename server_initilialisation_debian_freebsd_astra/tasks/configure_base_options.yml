@@ -8,6 +8,7 @@
 - name     : Set timezone
   community.general.timezone:
     name   : "{{ TIMEZONE }}"
+  when     : TIMEZONE is defined
 
 - name      : Create user or destroy user
   ansible.builtin.user:
@@ -17,6 +18,16 @@
     remove  : "{{ item.remove }}"
     state   : "{{ item.state }}"
   with_items: "{{ USERS_WITH_SSH }}"
+  when      : item.password is defined
+
+- name      : Create user or destroy user
+  ansible.builtin.user:
+    name    : "{{ item.user }}"
+    force   : "{{ item.force }}"
+    remove  : "{{ item.remove }}"
+    state   : "{{ item.state }}"
+  with_items: "{{ USERS_WITH_SSH }}"
+  when      : item.password is undefined
 
 - name: Set authorized key taken from file
   authorized_key:
