@@ -33,7 +33,7 @@
   authorized_key:
     user : "{{ item.user }}"
     state: "{{ item.state }}"
-    key: "{{ lookup('file', './files/secrets/ssh-keys/{{ item.file }}') }}"
+    key: "{{ lookup('file', './files/ssh-keys/{{ item.file }}') }}"
   when      : item.state == "present"
   with_items: "{{ USERS_WITH_SSH }}"
   notify    : Restart sshd service
