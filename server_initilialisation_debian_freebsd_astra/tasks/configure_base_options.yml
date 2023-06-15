@@ -1,8 +1,16 @@
 ---
-- name     : Set hostname
-  ansible.builtin.hostname:
-    name: "{{ HOSTNAME }}"
-  notify   : Reboot
+- name: Set hostname
+  block:
+  - name: Replace old hostname with new hostname 
+    ansible.builtin.replace:
+      path: /etc/hosts
+      regexp: '{{ ansible_fqdn }}'
+      replace: '{{ HOSTNAME }}'
+
+  - name     : Set hostname
+    ansible.builtin.hostname:
+      name: "{{ HOSTNAME }}"
+    notify   : Reboot
   when     : HOSTNAME is defined
 
 - name     : Set timezone
