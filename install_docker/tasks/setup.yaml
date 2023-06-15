@@ -35,9 +35,9 @@
 #     dest: /usr/bin/docker-compose
 #     mode: '+x'
 
-  - name     : Install docker modules
-    ansible.builtin.pip:
-      name   :
-        - docker
-        - jsondiff
-        - pyyaml
+- name     : Install docker modules
+  ansible.builtin.pip:
+    name   :
+      - docker
+      - jsondiff
+      - pyyaml
