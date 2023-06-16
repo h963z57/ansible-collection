@@ -6,7 +6,7 @@
 - name         : Configure sshd config
   include_tasks: configure_sshd_config.yml
 
-- name         : Install python3-apt
+- name         : Install python3-apt & pip
   apt          :
     pkg        :
         - python3-apt
