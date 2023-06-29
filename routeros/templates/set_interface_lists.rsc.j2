@@ -1,0 +1,7 @@
+{% for interface in MIKROTIK_INTERFACE_LISTS %}
+    {% if interface.state == "present" %}
+        :if ([/interface list find name={{ interface.name }}] ="") do={/interface list add name={{ interface.name }} comment="Added by Ansible"}
+    {% else %}
+        /interface list remove [find where name={{ interface.name }}]
+    {% endif %}
+{% endfor %}

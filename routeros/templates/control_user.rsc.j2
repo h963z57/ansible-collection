@@ -1,0 +1,11 @@
+{% if item.state == "present" %}
+
+    :if ([/user find name={{ item.name }}] ="") do={ :log info "User {{ item.name }} not found... Add it"}
+    :if ([/user find name={{ item.name }}] ="") do={ /user add name={{ item.name }} group=full password={{ item.password }}; }
+
+{% else %}
+
+    :if ([/user find name={{ item.name }}] ="") do={ :log info "User {{ item.name }} found... Remove it"}
+    :if ([/user find where name="{{ item.name }}"] != "") do={/user remove "{{ item.name }}"}
+
+{% endif %}

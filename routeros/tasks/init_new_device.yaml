@@ -1,0 +1,20 @@
+---
+- name: Generate random password via pwgen
+  command: "pwgen -s 19 1"
+  register: random_passwd
+
+- debug: var=random_passwd.stdout
+
+- name: Generate .rsc to check and add user
+  template:
+    src: add_user.rsc.j2
+    dest: ./files/tmp/initial_new_device_{{inventory_hostname}}.rsc
+
+- name: Run .rsc script
+  command: bash -c "cat ./files/tmp/initial_new_device_{{inventory_hostname}}.rsc | sshpass -p "{{ros_passwd}}" ssh {{ros_login}}@{{inventory_hostname}} -p 22 -T -o StrictHostKeyChecking=no -o NumberOfPasswordPrompts=1"
+
+- name: Delete temp .rsc file
+  file: 
+    path: ./files/tmp/initial_new_device_{{inventory_hostname}}.rsc
+    state: absent
+

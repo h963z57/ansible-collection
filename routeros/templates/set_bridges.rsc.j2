@@ -1,0 +1,16 @@
+{% for bridge in MIKROTIK_BRIDGE.LISTS %}
+    {% if bridge.state == "present" %}
+        :if ([/interface bridge find name={{ bridge.name }}] ="") do={/interface bridge add name="{{ bridge.name }}" comment="{{ bridge.comment }}"}
+        {% for port in MIKROTIK_BRIDGE.PORTS %}
+            {% if port.bridge == bridge.name %}
+                {% if port.state == "present" %}
+                    :if ([/interface bridge find name={{ bridge.name }}] !="" && [/interface find name={{ port.name }}] !="") do={/interface bridge port add bridge={{ bridge.name }} interface={{ port.name }} comment="{{ port.comment }}"}
+                {% else %}
+                    :if ([/interface bridge find name={{ bridge.name }}] !="" && [/interface find name={{ port.name }}] !="") do={/interface bridge port remove [find where interface={{ port.name }}]}
+                {% endif %}
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        :if ([/interface bridge find name={{ bridge.name }}] !="") do={/interface bridge remove [find where name={{ bridge.name }}]}
+    {% endif %}
+{% endfor %}

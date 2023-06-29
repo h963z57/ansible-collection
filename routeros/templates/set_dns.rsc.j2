@@ -1,0 +1,3 @@
+/ip dns set servers={% for dns_addr in MIKROTIK_DNS.SERVERS %}{% if loop.index == 1 %}{{ dns_addr }}{% else %},{{ dns_addr }}{% endif %}{% endfor %}
+
+/ip dhcp-client set [find ] use-peer-dns=no

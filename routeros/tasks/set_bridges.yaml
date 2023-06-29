@@ -1,0 +1,18 @@
+---
+- name: Generate .rsc to check and set bridges
+  template:
+    src: set_bridges.rsc.j2
+    dest: ./files/tmp/set_bridges_{{inventory_hostname}}.rsc
+
+- name: Run .rsc script
+  command: bash -c "cat ./files/tmp/set_bridges_{{inventory_hostname}}.rsc | ssh -i {{ ansible_ssh_private_key_file }} {{ ansible_user }}@{{inventory_hostname}} -T -p 22"
+  register: debug
+
+- name: debuig
+  debug:
+    msg: "{{ debug }}"
+
+# - name: Delete temp .rsc file
+#   file: 
+#     path: ./files/tmp/set_bridges_{{inventory_hostname}}.rsc
+#     state: absent

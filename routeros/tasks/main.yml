@@ -1,0 +1,32 @@
+---
+# tasks file for routeros
+
+- name         : Init new device
+  include_tasks: init_new_device.yaml
+  when         : MIKROTIK_INIT is true
+
+- name         : Set hostname
+  include_tasks: set_hostname.yaml
+  when         : MIKROTIK_HOSTNAME_CONTROL is true
+
+- name         : Configure users
+  include_tasks: user_control.yaml
+  when         : MIKROTIK_USER_CONTROL is true
+
+- name         : Set time settings
+  include_tasks: set_time_settings.yaml
+  when         : MIKROTIK_TIME_CONTROL is true
+# Дописать разрешающие правила в фаервол
+
+- name         : Set DNS settings
+  include_tasks: set_dns_settings.yaml
+  when         : MIKROTIK_DNS_CONTROL is true
+# Дописать разрешающие правила в фаервол
+
+- name         : Set interface lists
+  include_tasks: set_interface_lists.yaml
+  when         : MIKROTIK_INTERFACE_LISTS_CONTROL is true
+
+- name         : Set bridges & ports
+  include_tasks: set_bridges.yaml
+  when         : MIKROTIK_BRIDGE_CONTROL is true
