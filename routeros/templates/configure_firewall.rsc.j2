@@ -1,0 +1,92 @@
+{% if MIKROTIK_FIREWALL.STATE == true %}
+    {% if MIKROTIK_FIREWALL.RULES.BASIK_ALLOW %}
+        :if ([/ip firewall filter find comment="Established/Related/Untracked forward [use if cpu highload]"] ="") do={/ip firewall filter add action=accept chain=forward comment="Established/Related/Untracked forward [use if cpu highload]" connection-state=established,related,untracked}
+        :if ([/ip firewall filter find comment="Established/Related/Untracked input [use if cpu highload]"] ="") do={/ip firewall filter add action=accept chain=input comment="Established/Related/Untracked input [use if cpu highload]" connection-state=established,related,untracked}
+    {% else %}
+        :if ([/ip firewall filter find comment="Established/Related/Untracked forward [use if cpu highload]"] !="") do={/ip firewall filter remove [find where comment="Established/Related/Untracked forward [use if cpu highload]"]}
+        :if ([/ip firewall filter find comment="Established/Related/Untracked input [use if cpu highload]"] !="") do={/ip firewall filter remove [find where comment="Established/Related/Untracked input [use if cpu highload]"]}
+    {% endif %}
+
+    {% if MIKROTIK_FIREWALL.RULES.BASIK_BLOCK %}
+        :if ([/ip firewall filter find comment="Basic drop: invalid packages input"] ="") do={/ip firewall filter add action=drop chain=input comment="Basic drop: invalid packages input" connection-state=invalid in-interface-list=WAN}
+        :if ([/ip firewall filter find comment="Basic drop: invalid packages forward"] ="") do={/ip firewall filter add action=drop chain=forward comment="Basic drop: invalid packages forward" connection-state=invalid in-interface-list=WAN}
+    {% else %}
+        :if ([/ip firewall filter find comment="Basic drop: invalid packages input"] !="") do={/ip firewall filter remove [find where comment="Basic drop: invalid packages input"]}
+        :if ([/ip firewall filter find comment="Basic drop: invalid packages forward"] !="") do={/ip firewall filter remove [find where comment="Basic drop: invalid packages forward"]}
+    {% endif %}
+
+    {% if MIKROTIK_FIREWALL.RULES.PSD_CHECK %}
+        :if ([/ip firewall filter find comment="PSD check forward"] ="") do={/ip firewall filter add action=add-src-to-address-list address-list=9_BlackList_PSD_forward address-list-timeout=none-dynamic chain=forward comment="PSD check forward" psd=21,3s,3,1 src-address-list=!4_ExceptionList}
+        :if ([/ip firewall filter find comment="PSD check input"] ="") do={/ip firewall filter add action=add-src-to-address-list address-list=9_BlackList_PSD_input address-list-timeout=none-dynamic chain=input comment="PSD check input" psd=21,3s,3,1 src-address-list=!4_ExceptionList}
+    {% else %}
+        :if ([/ip firewall filter find comment="PSD check forward"] !="") do={/ip firewall filter remove [find where comment="PSD check forward"]}
+        :if ([/ip firewall filter find comment="PSD check input"] !="") do={/ip firewall filter remove [find where comment="PSD check input"]}
+    {% endif %}
+
+    {% if MIKROTIK_FIREWALL.RULES.ALLOW_DNS %}
+        :if ([/ip firewall filter find comment="Accept input: DNS-servers"] ="") do={/ip firewall filter add action=accept chain=input comment="Accept input: DNS-servers" src-address-list=3_InputAccess}
+    {% else %}
+        :if ([/ip firewall filter find comment="Accept input: DNS-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: DNS-servers"]}
+    {% endif %}
+
+    {% if MIKROTIK_FIREWALL.RULES.ALLOW_NTP %}
+        :if ([/ip firewall filter find comment="Accept input: NTP-servers"] ="") do={/ip firewall filter add action=accept chain=input comment="Accept input: NTP-servers" in-interface-list=WAN protocol=udp src-address-list=5_NTP src-port=123}
+    {% else %}
+        :if ([/ip firewall filter find comment="Accept input: NTP-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: NTP-servers"]}
+    {% endif %}
+
+    {% if MIKROTIK_FIREWALL.RULES.DELY_ALL %}
+        :if ([/ip firewall filter find comment="Deny all"] ="") do={/ip firewall filter add action=drop chain=input comment="Deny all" log-prefix=input_deny_all disabled="yes"}
+        :if ([/ip firewall filter find comment="Deny all [do not forget reset connection list]"] ="") do={/ip firewall filter add action=drop chain=forward comment="Deny all [do not forget reset connection list]" connection-nat-state=!dstnat log-prefix=forward_deny_all disabled=yes}
+    {% else %}
+        :if ([/ip firewall filter find comment="Deny all"] !="") do={/ip firewall filter remove [find where comment="Deny all"]}
+        :if ([/ip firewall filter find comment="Deny all [do not forget reset connection list]"] !="") do={/ip firewall filter remove [find where comment="Deny all [do not forget reset connection list]"]}
+    {% endif %}
+
+
+
+
+    {% if MIKROTIK_FIREWALL.RULES.DDOS_PROTECTION %}
+        :if ([/ip firewall mangle find comment="Start ddos check"] ="") do={/ip firewall mangle add action=jump chain=forward connection-state=new jump-target=detect-ddos comment="Start ddos check"}
+        :if ([/ip firewall mangle find comment="Check syn ddos"] ="") do={/ip firewall mangle add action=jump chain=forward connection-state=new jump-target=detect-ddos protocol=tcp tcp-flags=syn comment="Check syn ddos"}
+        :if ([/ip firewall mangle find comment="Compare"] ="") do={/ip firewall mangle add action=return chain=detect-ddos dst-limit=32,42,src-and-dst-addresses/1s comment="Compare"}
+        :if ([/ip firewall mangle find comment="Compare again"] ="") do={/ip firewall mangle add action=return chain=detect-ddos dst-limit=32,42,src-and-dst-addresses/1s comment="Compare again"}
+        :if ([/ip firewall mangle find comment="Add ddoser into blacklist"] ="") do={/ip firewall mangle add action=add-src-to-address-list address-list=ddoser address-list-timeout=none-dynamic chain=detect-ddos comment="Add ddoser into blacklist"}
+    {% else %}
+        :if ([/ip firewall mangle find comment="Start ddos check"] !="") do={/ip firewall mangle remove [find where comment="Start ddos check"]}
+        :if ([/ip firewall mangle find comment="Check syn ddos"] !="") do={/ip firewall mangle remove [find where comment="Check syn ddos"]}
+        :if ([/ip firewall mangle find comment="Compare"] !="") do={/ip firewall mangle remove [find where comment="Compare"]}
+        :if ([/ip firewall mangle find comment="Compare again"] !="") do={/ip firewall mangle remove [find where comment="Compare again"]}
+        :if ([/ip firewall mangle find comment="Add ddoser into blacklist"] !="") do={/ip firewall mangle remove [find where comment="Add ddoser into blacklist"]}
+    {% endif %}
+
+{% else %}
+
+    # allow for speed
+    :if ([/ip firewall filter find comment="Established/Related/Untracked forward [use if cpu highload]"] !="") do={/ip firewall filter remove [find where comment="Established/Related/Untracked forward [use if cpu highload]"]}
+    :if ([/ip firewall filter find comment="Established/Related/Untracked input [use if cpu highload]"] !="") do={/ip firewall filter remove [find where comment="Established/Related/Untracked input [use if cpu highload]"]}
+
+    # Drop invalid
+    :if ([/ip firewall filter find comment="Basic drop: invalid packages input"] !="") do={/ip firewall filter remove [find where comment="Basic drop: invalid packages input"]}
+    :if ([/ip firewall filter find comment="Basic drop: invalid packages forward"] !="") do={/ip firewall filter remove [find where comment="Basic drop: invalid packages forward"]}
+
+    # PSD
+    :if ([/ip firewall filter find comment="PSD check forward"] !="") do={/ip firewall filter remove [find where comment="PSD check forward"]}
+    :if ([/ip firewall filter find comment="PSD check input"] !="") do={/ip firewall filter remove [find where comment="PSD check input"]}
+
+    # DNS NTP
+    :if ([/ip firewall filter find comment="Accept input: DNS-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: DNS-servers"]}
+    :if ([/ip firewall filter find comment="Accept input: NTP-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: NTP-servers"]}
+
+    # Dyny all
+    :if ([/ip firewall filter find comment="Deny all"] !="") do={/ip firewall filter remove [find where comment="Deny all"]}
+    :if ([/ip firewall filter find comment="Deny all [do not forget reset connection list]"] !="") do={/ip firewall filter remove [find where comment="Deny all [do not forget reset connection list]"]}
+
+    # ddos
+    :if ([/ip firewall mangle find comment="Start ddos check"] !="") do={/ip firewall mangle remove [find where comment="Start ddos check"]}
+    :if ([/ip firewall mangle find comment="Check syn ddos"] !="") do={/ip firewall mangle remove [find where comment="Check syn ddos"]}
+    :if ([/ip firewall mangle find comment="Compare"] !="") do={/ip firewall mangle remove [find where comment="Compare"]}
+    :if ([/ip firewall mangle find comment="Compare again"] !="") do={/ip firewall mangle remove [find where comment="Compare again"]}
+    :if ([/ip firewall mangle find comment="Add ddoser into blacklist"] !="") do={/ip firewall mangle remove [find where comment="Add ddoser into blacklist"]}
+
+{% endif %}

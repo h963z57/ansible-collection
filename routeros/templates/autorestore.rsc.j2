@@ -1,0 +1,16 @@
+# /system backup save dont-encrypt=yes name=latest
+# /system/script/add name=autorestore source=":if (  ) do={}"
+
+
+:delay 300
+:local checklan [/ping 8.8.8.8 count=5]
+:if ($checklan = 0) do={:log error "PING LAN FAILED";  /system ssh 127.0.0.1 "system backup load name=latest.backup" password=""; /system ssh 127.0.0.1 "/y"} else={:log warning "Autorestore no needed"}
+
+
+
+/system ssh 127.0.0.1 "/system/backup/load name=latest.backup password=''" 
+/system ssh 127.0.0.1 "/y"
+
+
+/system ssh 127.0.0.1 "/system backup load name=latest.backup password=''"
+/system ssh 127.0.0.1 "/y"

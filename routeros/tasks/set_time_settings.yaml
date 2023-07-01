@@ -1,7 +1,7 @@
 ---
 - name: Generate .rsc to check and set time settings
   template:
-    src: set_timezone.rsc.j2
+    src: set_time_settings.rsc.j2
     dest: ./files/tmp/set_time_settings_{{inventory_hostname}}.rsc
 
 - name: Run .rsc script

@@ -1,0 +1,3 @@
+{% for service in MIKROTIK_SERVICES %}
+:if ([/ip service get {{ service.name }} disabled] !={{ service.disabled }}) do={/ip service set {{ service.name }} disabled="{{ service.disabled }}"}
+{% endfor %}

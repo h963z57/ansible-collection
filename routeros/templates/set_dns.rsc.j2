@@ -1,3 +1,11 @@
 /ip dns set servers={% for dns_addr in MIKROTIK_DNS.SERVERS %}{% if loop.index == 1 %}{{ dns_addr }}{% else %},{{ dns_addr }}{% endif %}{% endfor %}
 
 /ip dhcp-client set [find ] use-peer-dns=no
+/ip dns set allow-remote-requests={{ MIKROTIK_DNS.ALLOW_REMOTE_REQUESTS }}
+
+{% for dns_addr in MIKROTIK_DNS.SERVERS %}
+# Add pool into input access    
+        :if ([/ip firewall address-list find comment="EL-{{ dns_addr }}"] ="") do={/ip firewall address-list add address={{ dns_addr }} list=4_ExceptionList comment="EL-{{ dns_addr }}"}
+# Add pool into exeption list    
+        :if ([/ip firewall address-list find comment="IA-{{ dns_addr }}"] ="") do={/ip firewall address-list add address={{ dns_addr }} list=3_InputAccess comment="IA-{{ dns_addr }}"}
+{% endfor %}

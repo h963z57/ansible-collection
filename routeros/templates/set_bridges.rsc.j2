@@ -1,16 +1,33 @@
 {% for bridge in MIKROTIK_BRIDGE.LISTS %}
     {% if bridge.state == "present" %}
-        :if ([/interface bridge find name={{ bridge.name }}] ="") do={/interface bridge add name="{{ bridge.name }}" comment="{{ bridge.comment }}"}
-        {% for port in MIKROTIK_BRIDGE.PORTS %}
-            {% if port.bridge == bridge.name %}
-                {% if port.state == "present" %}
-                    :if ([/interface bridge find name={{ bridge.name }}] !="" && [/interface find name={{ port.name }}] !="") do={/interface bridge port add bridge={{ bridge.name }} interface={{ port.name }} comment="{{ port.comment }}"}
-                {% else %}
-                    :if ([/interface bridge find name={{ bridge.name }}] !="" && [/interface find name={{ port.name }}] !="") do={/interface bridge port remove [find where interface={{ port.name }}]}
-                {% endif %}
-            {% endif %}
-        {% endfor %}
+    # Create bridge 
+        :if ([/interface bridge find name=bridge-vlan{{ bridge.subnet }}-{{ bridge.name }}] ="") do={/interface bridge add name="bridge-vlan{{ bridge.subnet }}-{{ bridge.name }}" comment="{{ bridge.comment }}"}
+    # Create addres for bridge    
+        :if ([/ip address find address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.1/24"] ="") do={/ip address add address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.1/24" interface=bridge-vlan{{ bridge.subnet }}-{{ bridge.name }} comment="{{ bridge.comment }}"}
+    # Create ip pool    
+        :if ([/interface bridge find name=bridge-vlan{{ bridge.subnet }}-{{ bridge.name }}] !="" && [/ip pool find name=pool_for_{{ bridge.name }}] ="") do={/ip pool add name=pool_for_{{ bridge.name }} ranges={{ MIKROTIK_POOL }}.{{ bridge.subnet }}.{{ bridge.dhcp_start }}-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.254 comment="Added by Ansible"}
+    # Create network for bridge    
+        :if ([/ip dhcp-server network find address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24"] ="") do={/ip dhcp-server network add address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24" gateway="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.1" dns-server="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.1" comment="{{ bridge.comment }}"}
+    # Create DHCP server    
+        :if ([/ip dhcp-server find name=dhcp-{{ bridge.name }}] ="") do={/ip dhcp-server add name=dhcp-{{ bridge.name }} interface=bridge-vlan{{ bridge.subnet }}-{{ bridge.name }} address-pool pool_for_{{ bridge.name }} comment="{{ bridge.comment }}"}
+    # Add pool into input access    
+        :if ([/ip firewall address-list find comment="EL-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"] ="") do={/ip firewall address-list add address={{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24 list=4_ExceptionList comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"}
+    # Add pool into exeption list    
+        :if ([/ip firewall address-list find comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"] ="") do={/ip firewall address-list add address={{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24 list=3_InputAccess comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"}
     {% else %}
-        :if ([/interface bridge find name={{ bridge.name }}] !="") do={/interface bridge remove [find where name={{ bridge.name }}]}
+    # Remove bridge
+        :if ([/interface bridge find name=bridge-vlan{{ bridge.subnet }}-{{ bridge.name }}] !="") do={/interface bridge remove [find where name=bridge-vlan{{ bridge.subnet }}-{{ bridge.name }}]}
+    # Remove address    
+        :if ([/ip address find address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.1/24"] !="") do={/ip address remove [find where address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.1/24"]}
+    # Remove remove pool    
+        :if ([/ip pool find name=pool_for_{{ bridge.name }}] !="") do={/ip pool remove pool_for_{{ bridge.name }}}
+    # Remove network for bridge   
+        :if ([/ip dhcp-server network find address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24"] !="") do={/ip dhcp-server network remove [find where address="{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24"]}
+    # Remove DHCP server    
+        :if ([/ip dhcp-server find name=dhcp-{{ bridge.name }}] !="") do={/ip dhcp-server remove [find where name=dhcp-{{ bridge.name }}]}
+    # Remove pool input access    
+        :if ([/ip firewall address-list find comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"] !="") do={/ip firewall address-list remove [find where comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"]}
+    # Remove pool exeption list    
+        :if ([/ip firewall address-list find comment="EL-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"] !="") do={/ip firewall address-list remove [find where comment="EL-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"]}
     {% endif %}
 {% endfor %}

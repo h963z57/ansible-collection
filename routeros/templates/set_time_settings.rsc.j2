@@ -1,1 +1,19 @@
 /system clock set time-zone-name={{ MIKROTIK_TIMEZONE }}
+/system ntp client set enabled=yes
+{% for ntp_addr in MIKROTIK_NTP.SERVERS %}
+    {% if ntp_addr.state == "present" %}
+        /system ntp client servers add address={{ ntp_addr.addr }}
+    
+        :if ([/ip firewall address-list find comment="NTP-{{ ntp_addr.addr }}"] ="") do={/ip firewall address-list add address={{ ntp_addr.addr }} list=5_NTP comment="NTP-{{ ntp_addr.addr }}"}
+
+
+    {% else %}
+        /system ntp client servers remove [find where address={{ ntp_addr.addr }}]
+
+        :if ([/ip firewall address-list find comment="NTP-{{ ntp_addr.addr }}"] !="") do={/ip firewall address-list remove [find where comment="NTP-{{ ntp_addr.addr }}"]}
+
+    {% endif %}
+{% endfor %}
+/system clock set time-zone-autodetect=no
+/ip cloud set update-time=yes
+/system ntp server set enabled={{ MIKROTIK_NTP.ENABLE_SERVER }}

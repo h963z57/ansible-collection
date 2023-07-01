@@ -1,0 +1,9 @@
+{% if MIKROTIK_IPV6.STATE == false %}
+
+/ipv6 settings set disable-ipv6=yes
+
+{% else %}
+
+/ipv6 settings set disable-ipv6=no
+
+{% endif %}
