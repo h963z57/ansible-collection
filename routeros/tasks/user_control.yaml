@@ -19,4 +19,4 @@
   file: 
     path: ./files/tmp/create_user_{{ item.name }}_{{inventory_hostname}}.rsc 
     state: absent
-
+  with_items: "{{ MIKROTIK_USERS }}"

@@ -1,21 +1,25 @@
 ---
 # tasks file for routeros
 
-- name         : Init new device
-  include_tasks: init_new_device.yaml
-  when         : MIKROTIK_INIT is true
-
 # - name         : Create auto restore
 #   include_tasks: autorestore.yaml
 #   when         : MIKROTIK_AUTORESTORE is undefined
 
-- name         : Set hostname
-  include_tasks: set_hostname.yaml
-  when         : MIKROTIK_HOSTNAME_CONTROL is true
+- name         : Init new device
+  include_tasks: init_new_device.yaml
+  when         : MIKROTIK_INIT is true
 
 - name         : Configure users
   include_tasks: user_control.yaml
   when         : MIKROTIK_USER_CONTROL is true
+
+- name         : Enable / Disable services
+  include_tasks: enable_disable_services.yaml
+  when         : MIKROTIK_SERVICE_CONTROL is true
+
+- name         : Set hostname
+  include_tasks: set_hostname.yaml
+  when         : MIKROTIK_HOSTNAME_CONTROL is true
 
 - name         : Set time settings
   include_tasks: set_time_settings.yaml
@@ -25,25 +29,25 @@
   include_tasks: set_dns_settings.yaml
   when         : MIKROTIK_DNS_CONTROL is true
 
+- name         : Setup ipv6
+  include_tasks: set_ipv6.yaml
+  when         : MIKROTIK_IPV6_CONTROL is true
+
 - name         : Set interface lists
   include_tasks: set_interface_lists.yaml
   when         : MIKROTIK_INTERFACE_LISTS_CONTROL is true
-
-- name         : Set bridges & ports
-  include_tasks: set_bridges.yaml
-  when         : MIKROTIK_BRIDGE_CONTROL is true
-
-- name         : Enable / Disable services
-  include_tasks: enable_disable_services.yaml
-  when         : MIKROTIK_SERVICE_CONTROL is true
 
 - name         : Set access policy
   include_tasks: set_access_policy.yaml
   when         : MIKROTIK_ACCESS_CONTROL is true
 
-- name         : Setup ipv6
-  include_tasks: set_ipv6.yaml
-  when         : MIKROTIK_IPV6_CONTROL is true
+- name         : Set bridges & ports
+  include_tasks: set_bridges.yaml
+  when         : MIKROTIK_BRIDGE_CONTROL is true
+
+- name         : Configure WireGuard
+  include_tasks: configure_wireguard.yaml
+  when         : MIKROTIK_WIREGUARD_CONTROL is true
 
 - name         : Configure firewall
   include_tasks: configure_firewall.yaml

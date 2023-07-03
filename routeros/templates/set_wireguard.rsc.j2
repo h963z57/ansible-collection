@@ -1,0 +1,17 @@
+{% for wg in MIKROTIK_WIREGUARD %}
+    {% if wg.target == MIKROTIK_HOSTNAME %}
+        {% if wg.state == "present" %}
+            :if ([/interface wireguard find comment="{{ wg.comment }}"] ="") do={/interface wireguard add listen-port="{{ wg.port }}" name="{{ wg.name }}" private-key="{{ wg.private_key }}" comment="{{ wg.comment }}"}
+            :if ([/interface wireguard peers find comment="{{ wg.comment }}"] ="") do={/interface wireguard peers add allowed-address="{{ wg.allowed_addr }}" endpoint-address="{{ wg.entrypoint }}" endpoint-port="{{ wg.port }}" public-key="{{ wg.public_key }}" interface="{{ wg.name }}" comment="{{ wg.comment }}"}
+            :if ([/ip address find comment="{{ wg.comment }}"] ="") do={/ip address add address="{{ wg.ip }}/24" interface="{{ wg.name }}" comment="{{ wg.comment }}"}
+            :if ([/ip firewall address-list find comment="EL-{{ wg.entrypoint }}-{{ wg.comment }}"] ="") do={/ip firewall address-list add address={{ wg.entrypoint }} list=4_ExceptionList comment="EL-{{ wg.entrypoint }}-{{ wg.comment }}"}
+            :if ([/ip firewall address-list find comment="IA-{{ wg.entrypoint }}-{{ wg.comment }}"] ="") do={/ip firewall address-list add address={{ wg.entrypoint }} list=3_InputAccess comment="IA-{{ wg.entrypoint }}-{{ wg.comment }}"}  
+        {% else %}
+            :if ([/interface wireguard find comment="{{ wg.comment }}"] !="") do={/interface wireguard remove [find where comment="{{ wg.comment }}"]}
+            :if ([/interface wireguard peers find comment="{{ wg.comment }}"] !="") do={/interface wireguard peers remove [find where comment="{{ wg.comment }}"]}
+            :if ([/ip address find comment="{{ wg.comment }}"] !="") do={/ip address remove [find where comment="{{ wg.comment }}"]}   
+            :if ([/ip firewall address-list find comment="EL-{{ wg.entrypoint }}-{{ wg.comment }}"] !="") do={/ip firewall address-list remove [find where comment="EL-{{ wg.entrypoint }}-{{ wg.comment }}"]}  
+            :if ([/ip firewall address-list find comment="IA-{{ wg.entrypoint }}-{{ wg.comment }}"] !="") do={/ip firewall address-list remove [find where comment="IA-{{ wg.entrypoint }}-{{ wg.comment }}"]}
+        {% endif %}
+    {% endif %}
+{% endfor %}
