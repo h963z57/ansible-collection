@@ -1,4 +1,4 @@
-/system clock set time-zone-name={{ MIKROTIK_TIMEZONE }}
+/system clock set time-zone-name={{ MIKROTIK_NTP.TIMEZONE }}
 /system ntp client set enabled=yes
 {% for ntp_addr in MIKROTIK_NTP.SERVERS %}
     {% if ntp_addr.state == "present" %}

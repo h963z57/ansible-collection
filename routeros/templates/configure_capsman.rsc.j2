@@ -1,0 +1,57 @@
+{% if MIKROTIK_CAPSMAN.SERVER.STATE == true %}
+    /caps-man manager set enabled=yes
+
+    {% for security in MIKROTIK_CAPSMAN.SERVER.SECURITY %}
+        {% if security.target == MIKROTIK_HOSTNAME %}
+            {% if security.state == "present" %}
+                :if ([/caps-man security find name="{{ security.name }}"] ="") do={/caps-man security add authentication-types={{ security.authentication_types }} encryption={{ security.encryption }} group-encryption={{ security.group_encryption }} group-key-update={{ security.group_key_update }} name={{ security.name }} passphrase="{{ security.passphrase }}" comment="{{ security.comment }}"}
+            {% else %}
+                :if ([/caps-man security find name="{{ security.name }}"] !="") do={/caps-man security remove {{ security.name }}}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% for datapath in MIKROTIK_CAPSMAN.SERVER.DATAPATHS %}
+        {% if datapath.target == MIKROTIK_HOSTNAME %}
+            {% if datapath.state == "present" %}
+                :if ([/caps-man datapath find name={{ datapath.name }}] ="") do={/caps-man datapath add bridge={{ datapath.bridge }} client-to-client-forwarding={{ datapath.client_to_client_forwarding }} local-forwarding={{ datapath.local_forwarding }} name={{ datapath.name }} comment="{{ datapath.comment }}"}
+            {% else %}
+                :if ([/caps-man datapath find name={{ datapath.name }}] !="") do={/caps-man datapath remove {{ datapath.name }}}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% for channel in MIKROTIK_CAPSMAN.SERVER.CHANNELS %}
+        {% if channel.target == MIKROTIK_HOSTNAME %}
+            {% if channel.state == "present" %}
+                :if ([/caps-man channel find name="{{ channel.name }}"] ="") do={/caps-man channel add band="{{ channel.band }}" control-channel-width="{{ channel.control_channel_width }}" frequency="{{ channel.frequency }}"  name="{{ channel.name }}" reselect-interval="{{ channel.reselect_interval }}" tx-power="{{ channel.tx_power }}" comment="{{ channel.comment }}" {% if channel.extension_channel is defined %} extension-channel="{{ channel.extension_channel }}" {% endif %} {% if channel.save_selected is defined  %} save-selected="{{ channel.save_selected }}" {% endif %}}
+
+            {% else %}
+                :if ([/caps-man channel find name="{{ channel.name }}"] !="") do={/caps-man channel remove "{{ channel.name }}"}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% for configuration in MIKROTIK_CAPSMAN.SERVER.CONFIGURATIONS %}
+        {% if configuration.target == MIKROTIK_HOSTNAME %}
+            {% if configuration.state == "present" %}
+                :if ([/caps-man configuration find name={{ configuration.name }}] ="") do={/caps-man configuration add channel={{ configuration.channel_name }} country={{ configuration.country }} datapath={{ configuration.datapath_name }} distance={{ configuration.distance }} guard-interval={{ configuration.guard_interval }} hw-protection-mode={{ configuration.hw_protection_mode }} installation={{ configuration.installation }} keepalive-frames={{ configuration.keepalive_frames }} max-sta-count={{ configuration.max_sta_count }} mode=ap multicast-helper={{ configuration.multicast_helper }} name={{ configuration.name }} rx-chains={{ configuration.rx_chains }} security={{ configuration.security_name }} ssid={{ configuration.ssid }} tx-chains={{ configuration.tx_chains }} comment="{{ configuration.comment }}"}
+            {% else %}
+                :if ([/caps-man configuration find name={{ configuration.name }}] !="") do={/caps-man configuration remove "{{ configuration.name }}"}
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+
+    {% for provisioning in MIKROTIK_CAPSMAN.SERVER.PROVISIONING %}
+        {% if provisioning.target == MIKROTIK_HOSTNAME %}
+            {% if provisioning.state == "present" %}
+                :if ([/caps-man provisioning find comment="{{ provisioning.name_prefix }}-provisioning-{{ provisioning.comment }}"] ="") do={/caps-man provisioning add action="{{ provisioning.action }}" hw-supported-modes="{{ provisioning.hw_supported_modes }}" master-configuration="{{ provisioning.master_configuration_name }}" name-format="{{ provisioning.name_format }}" name-prefix="{{ provisioning.name_prefix }}" comment="{{ provisioning.name_prefix }}-provisioning-{{ provisioning.comment }}"}
+            {% else %}
+                :if ([/caps-man provisioning find comment="{{ provisioning.name_prefix }}-provisioning-{{ provisioning.comment }}"] !="") do={/caps-man provisioning remove [find where comment="{{ provisioning.name_prefix }}-provisioning-{{ provisioning.comment }}"]}
+            {% endif %} 
+        {% endif %}
+    {% endfor %}
+
+{% else %}
+    /caps-man manager set enabled=no
+{% endif %}

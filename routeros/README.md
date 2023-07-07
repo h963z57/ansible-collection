@@ -32,6 +32,13 @@ Functions:
   - Add/Remove in Input/Exeption lists.
   - Enable/disable NTP servers
 - Configure WireGuard connection (client mode)
+- Configure CAPsMAN:
+  - Enable/Disable controller
+  - Create security profile
+  - Create datapath profile
+  - Create channel profile
+  - Create configuration
+  - Create provisioning
 
 Requirements
 ------------
@@ -107,6 +114,7 @@ Configure routers
     MIKROTIK_INTERFACE_LISTS_CONTROL: true
     MIKROTIK_ACCESS_CONTROL: true
     MIKROTIK_BRIDGE_CONTROL: true
+    MIKROTIK_CAPsMAN: true
     MIKROTIK_WIREGUARD_CONTROL: true
     MIKROTIK_FIREWALL_CONTROL: true
 
@@ -128,6 +136,7 @@ Configure switch
     MIKROTIK_DNS_CONTROL: true
     MIKROTIK_IPV6_CONTROL: true
     MIKROTIK_ACCESS_CONTROL: true
+    MIKROTIK_CAPsMAN: true
 
   roles:
   - routeros
@@ -219,4 +228,21 @@ MIKROTIK_FIREWALL:
         DELY_ALL: true
         DDOS_PROTECTION: false ##EXPEREMENTAL
 
+MIKROTIK_CAPSMAN:
+    SERVER:
+        STATE: true
+        SECURITY:
+            - {name: security, passphrase: "MyPass", authentication_types: "wpa2-psk", encryption: "aes-ccm", group_encryption: "aes-ccm", group_key_update: "40m", target: test1, state: present, comment: "Added by Ansible"}
+        DATAPATHS:
+            - {name: datapath, bridge: bridge-vlan4, client_to_client_forwarding: "yes", local_forwarding: "no", target: test1, state: present, comment: "Added by Ansible"}
+        CHANNELS:
+            - {name: "24Ghz", band: "2ghz-onlyn", control_channel_width: 20mhz, frequency: "2412,2437,2462", reselect_interval: "1h", tx_power: "14",                                                      target: test1, state: present, comment: "Added by Ansible"}
+            - {name: "5Ghz",  band: "5ghz-n/ac",  control_channel_width: 20mhz, frequency: "",               reselect_interval: "1h", tx_power: "20", extension_channel: "disabled", save_selected: "yes", target: test1, state: present, comment: "Added by Ansible"}
+        CONFIGURATIONS:
+            - {name: "24Ghz", ssid: "test", channel_name: "24Ghz",  country: russia4, datapath_name: datapath, distance: indoor, guard_interval: long, hw_protection_mode: "rts-cts", installation: indoor, keepalive_frames: enabled, max_sta_count: "15", multicast_helper: "full", rx_chains: "0,1,2,3", tx_chains: "0,1,2,3", security_name: "security", target: test1, state: present, comment: "Added by Ansible"}
+            - {name: "5Ghz",  ssid: "test", channel_name: "5Ghz",   country: russia4, datapath_name: datapath, distance: indoor, guard_interval: long, hw_protection_mode: "rts-cts", installation: indoor, keepalive_frames: enabled, max_sta_count: "15", multicast_helper: "full", rx_chains: "0,1,2,3", tx_chains: "0,1,2,3", security_name: "security", target: test1, state: present, comment: "Added by Ansible"}
+        PROVISIONING:
+            - {action: "create-dynamic-enabled", hw_supported_modes: "gn",    master_configuration_name: "24Ghz", name_format: "prefix-identity", name_prefix: "24GHz", target: test1, state: present, comment: "Added by Ansible"}
+            - {action: "create-dynamic-enabled", hw_supported_modes: "an,ac", master_configuration_name: "5Ghz",  name_format: "prefix-identity", name_prefix: "5GHz",  target: test1, state: present, comment: "Added by Ansible"}
+            - {action: "none",                   hw_supported_modes: "",      master_configuration_name: "24Ghz", name_format: "prefix-identity", name_prefix: "",      target: test1, state: present, comment: "Added by Ansible"}
 ```

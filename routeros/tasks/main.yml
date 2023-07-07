@@ -45,6 +45,10 @@
   include_tasks: set_bridges.yaml
   when         : MIKROTIK_BRIDGE_CONTROL is true
 
+- name         : Configure CAPsMAN
+  include_tasks: configure_capsman.yaml
+  when         : MIKROTIK_CAPsMAN is true
+
 - name         : Configure WireGuard
   include_tasks: configure_wireguard.yaml
   when         : MIKROTIK_WIREGUARD_CONTROL is true
