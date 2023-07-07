@@ -1,4 +1,4 @@
-{% for wg in MIKROTIK_WIREGUARD %}
+{% for wg in MIKROTIK_WIREGUARD_CLIENT %}
     {% if wg.target == MIKROTIK_HOSTNAME %}
         {% if wg.state == "present" %}
             :if ([/interface wireguard find comment="{{ wg.comment }}"] ="") do={/interface wireguard add listen-port="{{ wg.port }}" name="{{ wg.name }}" private-key="{{ wg.private_key }}" comment="{{ wg.comment }}"}

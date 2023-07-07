@@ -1,0 +1,28 @@
+{% for wg in MIKROTIK_WIREGUARD.SERVER %}
+    {% if wg.target == MIKROTIK_HOSTNAME %}
+        {% if wg.state == "present" %}
+            :if ([/interface wireguard find comment="{{ wg.comment }}"] ="") do={/interface wireguard add listen-port="{{ wg.port }}" name="{{ wg.name }}" private-key="{{ wg.private_key }}" comment="{{ wg.comment }}"}
+            :if ([/ip address find comment="{{ wg.comment }}"] ="") do={/ip address add address="{{ wg.address }}.1/24" interface="{{ wg.name }}" comment="{{ wg.comment }}"} 
+            :if ([/ip firewall address-list find comment="EL-{{ wg.address }}.0/24-{{ wg.comment }}"] ="") do={/ip firewall address-list add address={{ wg.address }}.0/24 list=4_ExceptionList comment="EL-{{ wg.address }}.0/24-{{ wg.comment }}"}
+            :if ([/ip firewall address-list find comment="IA-{{ wg.address }}.0/24-{{ wg.comment }}"] ="") do={/ip firewall address-list add address={{ wg.address }}.0/24 list=3_InputAccess comment="IA-{{ wg.address }}.0/24-{{ wg.comment }}"}
+        {% else %}
+            :if ([/interface wireguard find comment="{{ wg.comment }}"] !="") do={/interface wireguard remove [find where comment="{{ wg.comment }}"]}
+            :if ([/ip address find comment="{{ wg.comment }}"] !="") do={/ip address remove [find where comment="{{ wg.comment }}"]}   
+            :if ([/ip firewall address-list find comment="IA-{{ wg.address }}.0/24-{{ wg.comment }}"] !="") do={/ip firewall address-list remove [find where comment="IA-{{ wg.address }}.0/24-{{ wg.comment }}"]} 
+            :if ([/ip firewall address-list find comment="EL-{{ wg.address }}.0/24-{{ wg.comment }}"] !="") do={/ip firewall address-list remove [find where comment="EL-{{ wg.address }}.0/24-{{ wg.comment }}"]}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+ ## Добавить правила в исключения
+
+{% for peer in MIKROTIK_WIREGUARD.PEERS %}
+    {% if peer.target == MIKROTIK_HOSTNAME %}
+        {% if peer.state == "present" %}
+            :if ([/interface wireguard peers find comment="{{ peer.comment }}"] ="") do={/interface wireguard peers add allowed-address="{{ peer.allowed_address }}" public-key="{{ peer.public_key_client }}" interface="{{ peer.interface_name }}" persistent-keepalive="{{ peer.persistent_keepalive }}" comment="{{ peer.comment }}"}
+        {% else %}
+            :if ([/interface wireguard peers find comment="{{ peer.comment }}"] !="") do={/interface wireguard peers remove [find where comment="{{ peer.comment }}"]}
+        {% endif %}
+    {% endif %}
+{% endfor %}
+
+

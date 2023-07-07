@@ -24,9 +24,9 @@
     {% endif %}
 
     {% if MIKROTIK_FIREWALL.RULES.ALLOW_DNS %}
-        :if ([/ip firewall filter find comment="Accept input: DNS-servers"] ="") do={/ip firewall filter add action=accept chain=input comment="Accept input: DNS-servers" src-address-list=3_InputAccess}
+        :if ([/ip firewall filter find comment="Accept input: From input list"] ="") do={/ip firewall filter add action=accept chain=input comment="Accept input: From input list" src-address-list=3_InputAccess}
     {% else %}
-        :if ([/ip firewall filter find comment="Accept input: DNS-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: DNS-servers"]}
+        :if ([/ip firewall filter find comment="Accept input: From input list"] !="") do={/ip firewall filter remove [find where comment="Accept input: From input list"]}
     {% endif %}
 
     {% if MIKROTIK_FIREWALL.RULES.ALLOW_NTP %}
@@ -34,6 +34,14 @@
     {% else %}
         :if ([/ip firewall filter find comment="Accept input: NTP-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: NTP-servers"]}
     {% endif %}
+
+    {% for item in MIKROTIK_WIREGUARD.SERVER %}
+        {% if MIKROTIK_FIREWALL.RULES.ALLOW_WIREGUARD %}
+            :if ([/ip firewall filter find comment="Accept input: wireguard {{ item.comment }}"] ="") do={/ip firewall filter add action=accept chain=input comment="Accept input: wireguard {{ item.comment }}" in-interface-list=WAN protocol=udp dst-port={{ item.port }}}
+        {% else %}
+            :if ([/ip firewall filter find comment="Accept input: wireguard {{ item.comment }}"] !="") do={/ip firewall filter remove [find where comment="Accept input: wireguard {{ item.comment }}"]}
+        {% endif %}
+    {% endfor %}
 
     {% if MIKROTIK_FIREWALL.RULES.DELY_ALL %}
         :if ([/ip firewall filter find comment="Deny all"] ="") do={/ip firewall filter add action=drop chain=input comment="Deny all" log-prefix=input_deny_all disabled="yes"}
@@ -77,6 +85,8 @@
     # DNS NTP
     :if ([/ip firewall filter find comment="Accept input: DNS-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: DNS-servers"]}
     :if ([/ip firewall filter find comment="Accept input: NTP-servers"] !="") do={/ip firewall filter remove [find where comment="Accept input: NTP-servers"]}
+
+    # wireguard
 
     # Dyny all
     :if ([/ip firewall filter find comment="Deny all"] !="") do={/ip firewall filter remove [find where comment="Deny all"]}

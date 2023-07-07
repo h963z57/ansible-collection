@@ -72,7 +72,7 @@ Role Usage
 | COMMON_SETTINGS  | MIKROTIK_HOSTNAME | Unique name, also use wireguard configuration                 |
 | COMMON_SETTINGS  | MIKROTIK_POOL     | Use for create dhcp                                           |
  
-3) Create playbook and chose function. For use func, you need type true in vars.
+3) Create playbook and chose function. For use func, you need type **true** in vars.
 
 Init new device
 
@@ -115,7 +115,8 @@ Configure routers
     MIKROTIK_ACCESS_CONTROL: true
     MIKROTIK_BRIDGE_CONTROL: true
     MIKROTIK_CAPsMAN: true
-    MIKROTIK_WIREGUARD_CONTROL: true
+    MIKROTIK_WIREGUARD_CONTROL_CLIENT: true
+    MIKROTIK_WIREGUARD_CONTROL_SERVER: true  
     MIKROTIK_FIREWALL_CONTROL: true
 
   roles:
@@ -216,6 +217,13 @@ MIKROTIK_BRIDGE:
 MIKROTIK_WIREGUARD:
     - {name: WG_to_cloud, private_key: "0PS5hNrrhbKMwgKqWEFTAmM/M5lo=", public_key: "KMTDOMfoHkkxotcC2HU5Lfv5BA=", entrypoint: "x.x.x.x", port: "51820", allowed_addr: "172.0.0.0/8", ip: "172.15.1.2", target: "<Router hostname 1>", comment: "Connect my cloud", state: present}
     - {name: WG_to_cloud, private_key: "/vdQN9lHEop9ZU7EFTAmM/M5lo=", public_key: "KMTZCeOMfoHkkxotcC2HU5Lfv5BA=", entrypoint: "x.x.x.x", port: "51820", allowed_addr: "172.0.0.0/8", ip: "172.15.1.3", target: "<Router hostname 2>", comment: "Connect my work", state: present}
+
+MIKROTIK_WIREGUARD:
+    SERVER:
+        - {name: "WGMI", private_key: "<priv key>", port: "13231", address: "10.1.101",  state: present , target: "Mikrotik", comment: "tmp wg for debug created by ansible" }
+    PEERS:
+        - {interface_name: "WGMI", public_key_client: "<key>", allowed_address: "10.1.101.2", persistent_keepalive: "10",  state: present , target: "Mikrotik", comment: "admin" } # Interface name must be equal Server name.
+        - {interface_name: "WGMI", public_key_client: "<key>", allowed_address: "10.1.101.3", persistent_keepalive: "10",  state: present , target: "Mikrotik", comment: "admin_2" }
 
 MIKROTIK_FIREWALL:
     STATE: true

@@ -11,7 +11,7 @@
     # Create DHCP server    
         :if ([/ip dhcp-server find name=dhcp-{{ bridge.name }}] ="") do={/ip dhcp-server add name=dhcp-{{ bridge.name }} interface=bridge-vlan{{ bridge.subnet }}-{{ bridge.name }} address-pool pool_for_{{ bridge.name }} add-arp="{{ bridge.arp_dhcp }}" comment="{{ bridge.comment }}"}
     # Add pool into input access    
-        :if ([/ip firewall address-list find comment="EL-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"] ="") do={/ip firewall address-list add address={{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24 list=4_ExceptionList comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"}
+        :if ([/ip firewall address-list find comment="EL-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"] ="") do={/ip firewall address-list add address={{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24 list=4_ExceptionList comment="EL-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"}
     # Add pool into exeption list    
         :if ([/ip firewall address-list find comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"] ="") do={/ip firewall address-list add address={{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24 list=3_InputAccess comment="IA-{{ MIKROTIK_POOL }}.{{ bridge.subnet }}.0/24-{{ bridge.comment }}"}
     {% else %}

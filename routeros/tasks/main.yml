@@ -49,9 +49,13 @@
   include_tasks: configure_capsman.yaml
   when         : MIKROTIK_CAPsMAN is true
 
-- name         : Configure WireGuard
-  include_tasks: configure_wireguard.yaml
-  when         : MIKROTIK_WIREGUARD_CONTROL is true
+- name         : Configure WireGuard (client mode)
+  include_tasks: configure_wireguard_client.yaml
+  when         : MIKROTIK_WIREGUARD_CONTROL_CLIENT is true
+
+- name         : Configure WireGuard (server mode)
+  include_tasks: configure_wireguard_server.yaml
+  when         : MIKROTIK_WIREGUARD_CONTROL_SERVER is true
 
 - name         : Configure firewall
   include_tasks: configure_firewall.yaml
