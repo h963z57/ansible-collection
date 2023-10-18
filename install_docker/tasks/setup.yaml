@@ -22,6 +22,9 @@
 - name: Install Docker
   ansible.builtin.apt:
     name:
+      - python3-pip
+      - python3-docker
+      - python3-jsondiff
       - docker
       - docker.io
       - docker-registry
@@ -35,9 +38,9 @@
 #     dest: /usr/bin/docker-compose
 #     mode: '+x'
 
-- name     : Install docker modules
-  ansible.builtin.pip:
-    name   :
-      - docker
-      - jsondiff
-      - pyyaml
+# - name     : Install docker modules
+#   ansible.builtin.pip:
+#     name   :
+#       - docker
+#       - jsondiff
+#       - pyyaml
