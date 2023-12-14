@@ -1,0 +1,47 @@
+---
+- name: Install depends
+  ansible.builtin.apt:
+    name:
+      - wireguard
+      - iptables
+    state: latest
+    update_cache: true
+
+- name: Enable IPv4 formward
+  ansible.builtin.lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '#net.ipv4.ip_forward=1'
+    line: net.ipv4.ip_forward=1
+  notify: Restart sysctl 
+
+- name: Create nat rule part 1
+  ansible.builtin.lineinfile:
+    path: /etc/network/if-pre-up.d/nat
+    line: "#!/bin/sh"
+    mode: '0755'
+    create: yes
+
+- name: Create nat rule part 2
+  ansible.builtin.lineinfile:
+    path: /etc/network/if-pre-up.d/nat
+    line: "/sbin/iptables -A POSTROUTING -t nat -j MASQUERADE"
+    create: yes
+    mode: '0755'
+  notify: Activate nat
+
+- name: Disable wg before editing
+  ansible.builtin.systemd_service:
+    name: wg-quick@wg.service
+    enabled: false
+    state: stopped
+
+- name: Genirate wireguard configuration file
+  template:
+    src: wg.conf.j2
+    dest: /etc/wireguard/wg.conf
+
+- name: Enable wg after editing
+  ansible.builtin.systemd_service:
+    name: wg-quick@wg.service
+    enabled: true
+    state: started

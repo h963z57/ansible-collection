@@ -1,0 +1,11 @@
+---
+
+# WIREGUARD_PRIVATE_KEY: 
+# WIREGUARD_IP         : "172.26.0.1"
+# WIREGUARD_PORT       : "13231"
+# WIREGUARD_ACCOUNTS:
+#     - {name: <name>, public_key: <super-puper secret key>, ip: "172.26.0.2", target: vpn-0 <-- from inventory file , state: present}
+
+# Example of inventory file
+# [WIREGUARD]
+# example.com NODE=vpn-0

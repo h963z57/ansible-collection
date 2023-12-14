@@ -1,0 +1,6 @@
+---
+- name: Restart sysctl
+  shell: bash -c "sysctl -p"
+
+- name: Activate nat
+  shell: bash -c "iptables -A POSTROUTING -t nat -j MASQUERADE"
