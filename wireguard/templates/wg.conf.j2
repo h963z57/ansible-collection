@@ -4,7 +4,7 @@ Address = {{ WIREGUARD_IP }}/32
 ListenPort = {{ WIREGUARD_PORT }}
 SaveConfig = true
 {% for accounts in WIREGUARD_ACCOUNTS %}
-{% if accounts.target == NODE %}
+{% if accounts.target == WIREGUARD_NODE %}
 {% if accounts.state == "present" %}
 [Peer]
 PublicKey = {{ accounts.public_key }}
