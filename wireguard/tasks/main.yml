@@ -4,6 +4,7 @@
     name:
       - wireguard
       - iptables
+      - cron
     state: latest
     update_cache: true
 
@@ -14,19 +15,11 @@
     line: net.ipv4.ip_forward=1
   notify: Restart sysctl 
 
-- name: Create nat rule part 1
-  ansible.builtin.lineinfile:
-    path: /etc/network/if-pre-up.d/nat
-    line: "#!/bin/sh"
-    mode: '0755'
-    create: yes
-
-- name: Create nat rule part 2
-  ansible.builtin.lineinfile:
-    path: /etc/network/if-pre-up.d/nat
-    line: "/sbin/iptables -A POSTROUTING -t nat -j MASQUERADE"
-    create: yes
-    mode: '0755'
+- name: Create nat rule after reboot
+  ansible.builtin.cron:
+    name: "Start nat after reboot"
+    special_time: reboot
+    job: "/sbin/iptables -A POSTROUTING -t nat -j MASQUERADE"
   notify: Activate nat
 
 - name: Disable wg before editing
