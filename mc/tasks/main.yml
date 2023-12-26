@@ -1,0 +1,9 @@
+---
+# tasks file for mc
+
+- name         : Install mc
+  include_tasks: installation.yaml
+  when: MC_INSTALL == true
+
+- name         : Configuration mc
+  include_tasks: configuration.yaml

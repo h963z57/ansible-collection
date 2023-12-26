@@ -1,0 +1,32 @@
+- name: Configuration credentials MinIO Client
+  command: mc alias set {{ item.name }} {{ item.url }} {{ item.access_key }} {{ item.secret_key }}
+  no_log: true
+  with_items: "{{ MC_CREDENTIALS }}"
+  when: 
+    - MC_NODE == item.target
+
+- name: Config auto backups mc (withut special_time)
+  ansible.builtin.cron:
+    name: "{{ item.name }}"
+    month: "{{ item.month }}"
+    day: "{{ item.day }}"
+    weekday: "{{ item.weekday }}"
+    hour: "{{ item.hour }}"
+    minute: "{{ item.minute }}"
+    job: "{{ item.comman }}"
+    state: "{{ item.state }}"
+  when: 
+    - MC_NODE == item.target
+    - item.special_time is undefined
+  with_items: "{{ MC_BACKUP_CONFIGS }}"
+
+- name: Config auto backups mc (with special_time)
+  ansible.builtin.cron:
+    name: "{{ item.name }}"
+    special_time: "{{ item.special_time }}"
+    job: "{{ item.comman }}"
+    state: "{{ item.state }}"
+  when: 
+    - MC_NODE == item.target
+    - item.special_time is defined
+  with_items: "{{ MC_BACKUP_CONFIGS }}"

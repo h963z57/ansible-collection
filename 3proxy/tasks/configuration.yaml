@@ -1,0 +1,51 @@
+- name: Create user 3proxy without shell and home dir
+  ansible.builtin.user:
+    name: 3proxy
+    create_home: false
+    shell: /usr/sbin/nologin
+    system: true
+  register: proxy_user
+
+- name: Debug
+  debug:
+    msg: "{{ proxy_user.uid }} - {{ proxy_user.group }}"
+
+- name: Create folder structure
+  ansible.builtin.file:
+    path: "{{ item.path }}"
+    owner: "{{ proxy_user.name }}"
+    group: "{{ proxy_user.name }}"
+    mode: "{{ item.mode }}"
+    state: directory
+    # recurse: true
+  with_items:
+    - {name: conf-dir, mode: 660, path: /etc/3proxy,     state: present}
+    - {name: logs    , mode: 744, path: /var/log/3proxy, state: present}
+
+- name: Copy executable file to /usr/bin
+  ansible.builtin.copy:
+    remote_src: yes
+    src: /tmp/3proxy-0.9.3/bin/3proxy
+    dest: /usr/bin/
+    owner: "{{ proxy_user.name }}"
+    group: "{{ proxy_user.name }}"
+    mode: +x
+
+- name: Genirate conf files
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+    mode: "{{ item.mode }}"
+    owner: "{{ item.user }}"
+    group: "{{ item.group }}"
+  with_items:
+    - {name: config,  src: 3proxy.cfg.j2,     dest: /etc/3proxy/3proxy.cfg,             user: "{{ proxy_user.name }}", group: "{{ proxy_user.name }}", mode: 400, state: present}
+    # - {name: users,   src: .proxyauth.j2,     dest: /etc/3proxy/.proxyauth,             user: "{{ proxy_user.name }}", group: "{{ proxy_user.name }}", mode: 400, state: present}
+    - {name: sysctl,  src: 3proxy.service.j2, dest: /etc/systemd/system/3proxy.service, user: "root",                  group: "root",                  mode: 664, state: present}
+
+- name           : Make sure the service is started and enabled via systemd
+  systemd:
+    name         : "3proxy"
+    state        : restarted
+    enabled      : yes
+    daemon_reload: yes

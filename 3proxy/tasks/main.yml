@@ -1,0 +1,9 @@
+---
+# tasks file for 3proxy
+
+- name         : Install 3proxy
+  include_tasks: installation.yaml
+  when: PROXY_INSTALL == true
+
+- name         : Configuration 3proxy
+  include_tasks: configuration.yaml

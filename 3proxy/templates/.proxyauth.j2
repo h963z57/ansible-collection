@@ -1,0 +1,7 @@
+{% for account in PROXY_ACCOUNTS %}
+{% if account.target == PROXY_NODE %}
+{% if account.state == "present" %}
+{{ account.name }}:{{ account.pass_type }}:{{ account.password }}
+{% endif %}
+{% endif %}
+{% endfor %}
