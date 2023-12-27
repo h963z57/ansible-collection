@@ -1,38 +1,54 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Install & configure 3proxy
 
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Create next group_vars file **USE ANSIBLE VAULT**
+```yaml
+---
+ansible_user                : <username>
+ansible_ssh_private_key_file: <path to ssh key>
 
-Dependencies
-------------
-
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+PROXY_INSTALL: false # chage to true for first time
+PROXY_PORT: 3128     # default 3proxy port
+PROXY_NAME_SERVERS:  # list of dns serves
+  - 8.8.8.8
+  - 8.8.4.4
+PROXY_ACCOUNTS:      # list of proxy credentials
+  - {name: <your login>, password: "<your pass>", pass_type: <type of password see 3proxy doc default is CL (unencrypted)>, target: <name of PROXY_NODE var>, state: present}
+  # example
+  - {name: login, password: "pass", pass_type: CL, target: proxy-0, state: present}
+```
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+- name: Configure 3proxy
+  hosts: PROXY
+  become: true
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+  roles:
+  - role: 3proxy
+```
 
-License
--------
+Example Hosts
+----------------
+```
+[PROXY]
+52.58.195.204 PROXY_NODE=proxy-0
+```
 
-BSD
+Example Comand
+----------------
+```sh
+# First start
+ansible-playbook configure-proxy.yaml -e PROXY_INSTALL=true --ask-vault-pass
 
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+# Configure (without installation)
+ansible-playbook configure-proxy.yaml --ask-vault-pass
+```

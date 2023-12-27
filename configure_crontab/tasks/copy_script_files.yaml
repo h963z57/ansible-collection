@@ -1,6 +1,0 @@
-- name: copy script files
-  copy:
-    src: ./files/configs/{{ item }}
-    dest: scripts/
-    mode: 0555
-  with_items: "{{ CRONTAB_SCRIPTS }}"

@@ -1,38 +1,63 @@
 Role Name
 =========
 
-A brief description of the role goes here.
+Install & configure mc (minio) for backup to s3 storage
 
-Requirements
-------------
-
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+Discription
+--------------
+Role using for S3 minio application and crontab for shedule. See mc and crontab docs for more info
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+Create next group_vars file **USE ANSIBLE VAULT**
+```yaml
+---
+ansible_user                : <you login>
+ansible_ssh_private_key_file: <path to ssh key>
 
-Dependencies
-------------
+MC_INSTALL: false # chage to true for first time
+# NAMES MUST BE DIFFERENT
+MC_CREDENTIALS:   # list of mc credentials
+  - {name: s3, url: "https://endpoint.com", access_key: "access_key", secret_key: "secret_key", target: <name of MC_NODE var>, state: present}
+  # Example
+  - {name: s3, url: "https://endpoint.com", access_key: "access_key", secret_key: "secret_key", target: main, state: present}
+MC_BACKUP_CONFIGS:
+  # Backup from local to s3
+  - {name: "Unique name 1", comman: "mc mirror --remove --overwrite /my/path/ s3/my-bucket/", month: "*", day: "*", weekday: "6", hour: "3", minute: "0", target: main, state: present}
+  # Backup from s3 to s3
+  - {name: "Unique name 2", comman: "mc mirror --remove --overwrite s3/my-bucket-1/ s3/my-bucket-2/", month: "*", day: "15", weekday: "*", hour: "3", minute: "0", target: second, state: present}
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+  # if you need special time
+  - {name: , comman: "mc mirror ... ", special_time: "reboot", target: main, state: absent}
+```
 
 Example Playbook
 ----------------
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+- name: Configure mc backup
+  hosts: BACKUPS
+  become: true
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+  roles:
+    - mc
+```
 
-License
--------
+Example Hosts
+----------------
+```
+[PROXY]
+52.58.195.204 MC_NODE=main
+52.58.195.205 MC_NODE=second
+```
 
-BSD
+Example Comand
+----------------
+```sh
+# First start
+ansible-playbook configure_mc_backup.yaml -e MC_INSTALL=true --ask-vault-pass
 
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+# Configure (without installation)
+ansible-playbook configure_mc_backup.yaml --ask-vault-pass
+```
