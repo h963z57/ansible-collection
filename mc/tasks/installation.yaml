@@ -25,6 +25,13 @@
     dest: /usr/local/bin/mc
     mode: '0755'
 
+- name: Create a symbolic link
+  ansible.builtin.file:
+    src: /usr/local/bin/mc
+    dest: /usr/bin/mc
+    state: link
+    mode: 0755
+
 - name: Check version MinIO Client
   command: "mc --version"
   register: mc_version
