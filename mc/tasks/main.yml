@@ -3,7 +3,7 @@
 
 - name         : Install mc
   include_tasks: installation.yaml
-  when: MC_INSTALL == true
+  when: MC_INSTALL == true and MC_NODE is defined
 
 - name         : Configuration mc
   include_tasks: configuration.yaml

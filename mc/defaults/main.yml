@@ -1,2 +1,3 @@
 ---
 # defaults file for mc
+MC_INSTALL: false
