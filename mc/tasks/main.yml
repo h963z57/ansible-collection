@@ -7,3 +7,6 @@
 
 - name         : Configuration mc
   include_tasks: configuration.yaml
+
+- name         : Create configuration
+  include_tasks: create_configuration.yaml

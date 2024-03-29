@@ -40,3 +40,10 @@
 - name: Output version MinIO Client
   debug:
     msg: "{{ mc_version.stdout }}"
+
+- name: Install cron
+  ansible.builtin.apt:
+    name:
+      - cron
+    state: latest
+    update_cache: true

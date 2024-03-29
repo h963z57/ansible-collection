@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.1.0] - 29-Mar-2024
+### Added
+- Template bucket-synk.sh to mc role
+- Template sendmail.py to mc role
+
 ## [2.0.1] - 15-Mar-2024
 ### Changed
 - Minor fix mc module for work with crontab

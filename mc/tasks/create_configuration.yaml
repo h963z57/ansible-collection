@@ -1,0 +1,19 @@
+- name: Create script for sync buckets
+  template:
+    src : bucket-sync.sh.j2
+    dest: "/root/bucket-sync.sh"
+    mode: 0500
+
+- name: Copy sent email script
+  template:
+    src : sendemail.py
+    dest: "/root/sendemail.py"
+    mode: 0500
+
+- name: Schedule script execution
+  ansible.builtin.cron:
+    name: "Run my script"
+    hour: "3"
+    minute: "0"
+    job: /root/bucket-sync.sh
+    state: present
