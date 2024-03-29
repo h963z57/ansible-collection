@@ -19,17 +19,13 @@ ansible_ssh_private_key_file: <path to ssh key>
 MC_INSTALL: false # chage to true for first time
 # NAMES MUST BE DIFFERENT
 MC_CREDENTIALS:   # list of mc credentials
-  - {name: s3, url: "https://endpoint.com", access_key: "access_key", secret_key: "secret_key", target: <name of MC_NODE var>, state: present}
+  - {name: s3, url: "https://endpoint.com", access_key: "access_key", secret_key: "secret_key", target: <name of SERVERNAME var>, state: present}
   # Example
-  - {name: s3, url: "https://endpoint.com", access_key: "access_key", secret_key: "secret_key", target: main, state: present}
-MC_BACKUP_CONFIGS:
-  # Backup from local to s3
-  - {name: "Unique name 1", comman: "mc mirror --remove --overwrite /my/path/ s3/my-bucket/", month: "*", day: "*", weekday: "6", hour: "3", minute: "0", target: main, state: present}
-  # Backup from s3 to s3
-  - {name: "Unique name 2", comman: "mc mirror --remove --overwrite s3/my-bucket-1/ s3/my-bucket-2/", month: "*", day: "15", weekday: "*", hour: "3", minute: "0", target: second, state: present}
+  - {name: s3, url: "https://endpoint.com", access_key: "access_key", secret_key: "secret_key", target: master, state: present}
+MC_SYNCPAIR:
+  - {name: "NAME(of db)", src: "127.0.0.1(or path)", dest: "s3/bucket-name/some_dir(dir is optional)", target: master,  type: "pgsql (may be file, tar, synk)", state: present} 
 
-  # if you need special time
-  - {name: , comman: "mc mirror ... ", special_time: "reboot", target: main, state: absent}
+
 ```
 
 Example Playbook
@@ -48,8 +44,8 @@ Example Hosts
 ----------------
 ```
 [PROXY]
-52.58.195.204 MC_NODE=main
-52.58.195.205 MC_NODE=second
+52.58.195.204 SERVERNAME=master MC_NODE=true
+52.58.195.205 SERVERNAME=slave MC_NODE=true
 ```
 
 Example Comand
