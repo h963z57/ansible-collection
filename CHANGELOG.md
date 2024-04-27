@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.1.1] - 27-Apr-2024
+### Changed
+- "error" to ERROR mc_backup
+
 ## [2.1.0] - 29-Mar-2024
 ### Added
 - Template bucket-synk.sh to mc role

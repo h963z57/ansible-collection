@@ -9,21 +9,21 @@ echo "" >> /var/log/synk.log
 {% if chain.type == "tar" %}
 tar cz {{ chain.src }} | mc pipe {{ chain.dest }}/backup-{{ chain.name }}-$(date +%Y-%m-%d).tar.gz
 if [ $? -ne 0 ]; then
-  echo "Synk error {{ chain.name }}" >> /var/log/synk.log
+  echo "Synk *ERROR* {{ chain.name }}" >> /var/log/synk.log
 else
   echo "Sync success {{ chain.name }}" >> /var/log/synk.log
 fi
 {% elif chain.type == "sync" %}
 mc mirror --remove --overwrite {{ chain.src }} {{ chain.dest }}
 if [ $? -ne 0 ]; then
-  echo "Synk error {{ chain.name }}" >> /var/log/synk.log
+  echo "Synk *ERROR* {{ chain.name }}" >> /var/log/synk.log
 else
   echo "Sync success {{ chain.name }}" >> /var/log/synk.log
 fi
 {% elif chain.type == "file" %}
 mc cp {{ chain.src }} {{ chain.dest }}/file-{{ chain.name }}-$(date +%Y-%m-%d)
 if [ $? -ne 0 ]; then
-  echo "Synk error {{ chain.name }}" >> /var/log/synk.log
+  echo "Synk *ERROR* {{ chain.name }}" >> /var/log/synk.log
 else
   echo "Sync success {{ chain.name }}" >> /var/log/synk.log
 fi
@@ -32,7 +32,7 @@ export PGPASSWORD='{{ DOCKER_COMPOSE_DB_MASTER_PASS }}'
 pg_dump -U {{ DOCKER_COMPOSE_DB_MASTER_USER }} -d {{ chain.name }} -h {{ chain.src }} > /tmp/database-{{ chain.name }}-$(date +%Y-%m-%d).pgsql.sql # | mc pipe {{ chain.dest }}/backup-{{ chain.name }}-$(date +%Y-%m-%d).pgsql.sql
 mc mv /tmp/database-{{ chain.name }}-$(date +%Y-%m-%d).pgsql.sql {{ chain.dest }}/
 if [ $? -ne 0 ]; then
-  echo "Synk error {{ chain.name }}" >> /var/log/synk.log
+  echo "Synk *ERROR* {{ chain.name }}" >> /var/log/synk.log
 else
   echo "Sync success {{ chain.name }}" >> /var/log/synk.log
 fi
