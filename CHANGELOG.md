@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.2.1] - 20-Jul-2024
+### Added
+- New backup type efs-tar
+
 ## [2.1.1] - 27-Apr-2024
 ### Changed
 - "error" to ERROR mc_backup

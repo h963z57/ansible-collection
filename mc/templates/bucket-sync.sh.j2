@@ -36,6 +36,13 @@ if [ $? -ne 0 ]; then
 else
   echo "Sync success {{ chain.name }}" >> /var/log/synk.log
 fi
+{% elif chain.type == "efs-tar" %}
+tar cz /mnt/EFS/{{ chain.name }} | mc pipe {{ chain.dest }}/backup-{{ chain.name }}-$(date +%Y-%m-%d).tar.gz
+if [ $? -ne 0 ]; then
+  echo "Synk *ERROR* {{ chain.name }}" >> /var/log/synk.log
+else
+  echo "Sync success {{ chain.name }}" >> /var/log/synk.log
+fi
 {% endif %}
 {% endif %}
 {% endif %}

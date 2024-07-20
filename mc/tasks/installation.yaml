@@ -16,6 +16,7 @@
   ansible.builtin.apt:
     name:
       - cron
+      - nfs-common
     state: latest
     update_cache: true
 

@@ -1,0 +1,26 @@
+- name: Create mount point of efs storage
+  file:
+    path: /mnt/EFS/{{ item.name }}
+    state: directory
+  when: item.type == "efs-tar"
+  with_items: "{{ MC_SYNCPAIR }}"
+
+- name: Mount efs storage
+  mount:
+    path: /mnt/EFS/{{ item.name }}
+    src: "{{ item.src }}:/"
+    fstype: nfs4
+    opts: nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
+    state: mounted
+  when: item.type == "efs-tar"
+  with_items: "{{ MC_SYNCPAIR }}"
+
+- name: Add to fstab efs storage
+  mount:
+    path: /mnt/EFS/{{ item.name }}
+    src: "{{ item.src }}:/"
+    fstype: ext4
+    opts: defaults
+    state: present
+  when: item.type == "efs-tar"
+  with_items: "{{ MC_SYNCPAIR }}"

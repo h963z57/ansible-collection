@@ -8,5 +8,8 @@
 - name         : Configuration mc
   include_tasks: configuration.yaml
 
+- name         : Prepare to efs
+  include_tasks: efs_backup_preparation.yaml
+
 - name         : Create configuration
   include_tasks: create_configuration.yaml
