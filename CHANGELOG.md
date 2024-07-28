@@ -1,4 +1,7 @@
 # Changelog
+## [2.3.0] - 28-Jul-2024
+### Changed
+- MC backup EFS mount
 
 ## [2.2.1] - 20-Jul-2024
 ### Added
