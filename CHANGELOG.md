@@ -1,4 +1,8 @@
 # Changelog
+## [2.4.0] - 14-Aug-2024
+### Added
+- MC backup bucketState type
+
 ## [2.3.0] - 28-Jul-2024
 ### Changed
 - MC backup EFS mount

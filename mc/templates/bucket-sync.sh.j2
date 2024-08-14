@@ -27,6 +27,13 @@ if [ $? -ne 0 ]; then
 else
   echo "Sync success {{ chain.name }}" >> /var/log/synk.log
 fi
+{% elif chain.type == "bucketState" %}
+mc cp -r {{ chain.src }} {{ chain.dest }}/state-{{ chain.name }}-$(date +%Y-%m-%d)
+if [ $? -ne 0 ]; then
+  echo "Synk *ERROR* {{ chain.name }}" >> /var/log/synk.log
+else
+  echo "Sync success {{ chain.name }}" >> /var/log/synk.log
+fi
 {% elif chain.type == "pgsql" %}
 export PGPASSWORD='{{ DOCKER_COMPOSE_DB_MASTER_PASS }}' 
 pg_dump -U {{ DOCKER_COMPOSE_DB_MASTER_USER }} -d {{ chain.name }} -h {{ chain.src }} > /tmp/database-{{ chain.name }}-$(date +%Y-%m-%d).pgsql.sql # | mc pipe {{ chain.dest }}/backup-{{ chain.name }}-$(date +%Y-%m-%d).pgsql.sql
