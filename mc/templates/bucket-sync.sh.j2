@@ -50,6 +50,13 @@ if [ $? -ne 0 ]; then
 else
   echo "Sync success {{ chain.name }}" >> /var/log/synk.log
 fi
+{% elif chain.type == "efs-sync" %}
+mc mirror --remove --overwrite /mnt/EFS/{{ chain.name }} {{ chain.dest }}
+if [ $? -ne 0 ]; then
+  echo "Synk *ERROR* {{ chain.name }}" >> /var/log/synk.log
+else
+  echo "Sync success {{ chain.name }}" >> /var/log/synk.log
+fi
 {% endif %}
 {% endif %}
 {% endif %}

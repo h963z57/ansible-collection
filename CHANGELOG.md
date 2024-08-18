@@ -1,4 +1,8 @@
 # Changelog
+## [2.5.0] - 18-Aug-2024
+### Added
+- MC backup efs-sync type
+
 ## [2.4.0] - 14-Aug-2024
 ### Added
 - MC backup bucketState type

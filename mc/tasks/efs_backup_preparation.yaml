@@ -2,7 +2,7 @@
   file:
     path: /mnt/EFS/{{ item.name }}
     state: directory
-  when: item.type == "efs-tar" and SERVERNAME == item.target
+  when: (item.type == "efs-tar" or item.type == "efs-sync") and SERVERNAME == item.target
   with_items: "{{ MC_SYNCPAIR }}" 
 
 - name: Mount efs storage
@@ -12,7 +12,7 @@
     fstype: nfs4
     opts: nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport
     state: mounted
-  when: item.type == "efs-tar" and SERVERNAME == item.target
+  when: (item.type == "efs-tar" or item.type == "efs-sync") and SERVERNAME == item.target
   with_items: "{{ MC_SYNCPAIR }}"
 
 - name: Add cron job to run a mount at system boot
@@ -20,5 +20,5 @@
     name: "Add mount at boot for {{ item.name }}"
     special_time: "reboot"
     job: "mount -t nfs4 -o nfsvers=4.1,rsize=1048576,wsize=1048576,hard,timeo=600,retrans=2,noresvport {{ item.src }}:/ /mnt/EFS/{{ item.name }}"
-  when: item.type == "efs-tar" and SERVERNAME == item.target
+  when: (item.type == "efs-tar" or item.type == "efs-sync") and SERVERNAME == item.target
   with_items: "{{ MC_SYNCPAIR }}" 
