@@ -13,3 +13,4 @@
 
 - name         : Create configuration
   include_tasks: create_configuration.yaml
+  when: MC_NODE is defined

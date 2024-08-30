@@ -1,4 +1,10 @@
 # Changelog
+## [2.5.1] - 30-Aug-2024
+### Changed
+- Add check to mc backup
+### Removed
+- Old code mc_backup
+
 ## [2.5.0] - 18-Aug-2024
 ### Added
 - MC backup efs-sync type
