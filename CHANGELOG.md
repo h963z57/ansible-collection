@@ -1,4 +1,8 @@
 # Changelog
+## [2.5.2] - 20-Sep-2024
+### Changed
+- ENV db params
+
 ## [2.5.1] - 30-Aug-2024
 ### Changed
 - Add check to mc backup
