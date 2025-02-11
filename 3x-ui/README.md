@@ -53,7 +53,7 @@ xui_username: "<login>"
 xui_password: "<password>"
 
 VPN_CLIENTS:
-  - {name: vpn-1, id: 1, enabled: "true", port: 30087, region: vpn-gen-1.example.net, 
+  - {name: vpn-1, id: 1, enabled: "true", port: 30087, regions: [ { host: vpn-0.example.net, remark: fra}, ], 
     publicKey: "2OZTDFZ4MARuYl7kteQtODqb6aLGkCwvdUm9dcYakm4",
     privateKey: "2IeHlZoyhcg-hfXorXiUCdIRpgXkWpxfj0GVi-vCJ0w",
     shortID: "40a799c7",
