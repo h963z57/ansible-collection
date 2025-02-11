@@ -17,6 +17,7 @@
     name:
       - cron
       - nfs-common
+      - curl
     state: latest
     update_cache: true
 
