@@ -1,0 +1,73 @@
+- name: Get inbound stats (up/down/total) for each id
+  uri:
+    url: "https://{{ xui_host }}:{{ xui_port }}/console/panel/api/inbounds/get/{{ item.id }}"
+    method: GET
+    headers:
+      Cookie: "{{ xui_cookie }}"
+    return_content: yes
+    status_code: [200, 302]
+    validate_certs: no
+  register: inbounds_stats
+  with_items: "{{ VPN_CLIENTS }}"
+  loop_control:
+    label: "{{ item.id }}"
+
+- name: Merge inbound stats into VPN_CLIENTS
+  set_fact:
+    VPN_CLIENTS_WITH_STATS: "{{ VPN_CLIENTS_WITH_STATS|default([]) + [ merged_inbound ] }}"
+  vars:
+    merged_inbound: >-
+      {{
+        item.0
+        | combine({
+            'up':   (item.1.json.obj.up   | default(0)),
+            'down': (item.1.json.obj.down | default(0)),
+            'total': (item.1.json.obj.total | default(0))
+        })
+      }}
+  with_together:
+    - "{{ VPN_CLIENTS }}"
+    - "{{ inbounds_stats.results }}"
+  loop_control:
+    label: "{{ item.0.id }}"
+
+# - name: Check VPN_CLIENTS_WITH_STATS
+#   debug:
+#     var: VPN_CLIENTS_WITH_STATS
+
+- name: Create inbounds (if not exists)
+  uri:
+    url: "https://{{ xui_host }}:{{ xui_port }}/console/panel/api/inbounds/add"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Cookie: "{{ xui_cookie }}"
+    body: "{{ lookup('template', 'inbound.j2') }}"
+    body_format: json
+    return_content: yes
+    status_code: [200, 302]
+    validate_certs: no
+  register: create_user_result
+  with_items: "{{ VPN_CLIENTS_WITH_STATS }}"
+
+- name: Update inbound with stats
+  uri:
+    url: "https://{{ xui_host }}:{{ xui_port }}/console/panel/api/inbounds/update/{{ item.id }}"
+    method: POST
+    headers:
+      Content-Type: "application/json"
+      Cookie: "{{ xui_cookie }}"
+    body: "{{ lookup('template','inbound.j2', inbound=item) }}"
+    body_format: json
+    return_content: yes
+    status_code: [200, 302]
+    validate_certs: no
+  register: update_result
+  with_items: "{{ VPN_CLIENTS_WITH_STATS }}"
+  loop_control:
+    label: "{{ item.id }}"
+
+- name: View result of update
+  debug:
+    # var: update_result
+    var: update_result.msg

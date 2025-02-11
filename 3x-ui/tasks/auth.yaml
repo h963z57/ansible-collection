@@ -1,0 +1,35 @@
+- name: Auth and get cookie cred
+  uri:
+    url: "https://{{ xui_host }}:{{ xui_port }}/console/login"
+    method: POST
+    body_format: json
+    body:
+      username: "{{ xui_username }}"
+      password: "{{ xui_password }}"
+    return_content: yes
+    status_code: [200, 302]
+    validate_certs: no
+  register: login_result
+
+# - name: Show cookie
+#   debug:
+#     var: login_result
+
+- name: Create auth variable
+  set_fact:
+    xui_cookie: "{{ login_result.cookies_string | default('') }}"
+
+# - name: Show cookie string
+#   debug:
+#     var: xui_cookie
+
+- name: Create backup
+  uri:
+    url: "https://{{ xui_host }}:{{ xui_port }}/console/panel/api/inbounds/createbackup"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Cookie: "{{ xui_cookie }}"
+    return_content: yes
+    status_code: [200, 302]
+    validate_certs: no

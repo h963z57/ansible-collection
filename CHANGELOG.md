@@ -1,4 +1,9 @@
 # Changelog
+
+## [2.6.0] - 11-Feb-2025
+### Added
+- 3x-ui manage
+
 ## [2.5.2] - 20-Sep-2024
 ### Changed
 - ENV db params

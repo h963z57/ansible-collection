@@ -1,0 +1,36 @@
+- name: Get stats
+  uri:
+    url: "https://{{ xui_host }}:{{ xui_port }}/console/panel/api/inbounds/getClientTraffics/{{ item.1.email }}"
+    method: GET
+    headers:
+      Content-Type: "application/json"
+      Cookie: "{{ xui_cookie }}"
+    return_content: yes
+    status_code: [200, 302]
+    validate_certs: no
+  register: create_user_result
+  with_subelements:
+    - "{{ VPN_CLIENTS }}"
+    - clients
+  loop_control:
+    label: "{{ item.1.email }}"
+
+- name: Convert stats into map (GB)
+  set_fact:
+    traffic_list: "{{ traffic_list|default([]) + [ my_obj ] }}"
+  vars:
+    my_obj: >-
+      {{
+        {
+          "email": item.json.obj.email,
+          "traffic": (
+            (item.json.obj.up|default(0) + item.json.obj.down|default(0))
+            / 1073741824
+          ) | float | round(2)
+        }
+      }}
+  loop: "{{ create_user_result.results }}"
+
+- name: Show stats
+  debug:
+    var: traffic_list

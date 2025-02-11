@@ -1,0 +1,17 @@
+{
+  "id": {{ item.id }},
+  "userId": 0,
+  "up": {{ item.up }},
+  "down": {{ item.down }},
+  "total": {{ item.total }},
+  "remark": "{{ item.name }}",
+  "enable": true,
+  "expiryTime": 0,
+  "listen": "",
+  "port": {{ item.port }},
+  "protocol": "vless",
+  "settings": "{\n  \"clients\": [\n    {% for client in item.clients %} {\n      \"email\": \"{{ client.email }}\",\n      \"enable\": {{ client.enabled }},\n      \"expiryTime\": {{ client.expiryTime }},\n      \"flow\": \"xtls-rprx-vision\",\n      \"id\": \"{{ client.id }}\",\n      \"limitIp\": 1,\n      \"reset\": 0,\n      \"subId\": \"{{ client.id }}\",\n      \"tgId\": \"{{ client.tgid }}\",\n      \"totalGB\": {{ client.totalGB * 1073741824 }}\n    }\n {% if not loop.last %},{% endif %} {% endfor %}  ],\n \"decryption\": \"none\",\n  \"fallbacks\": []\n}",
+  "streamSettings": "{\n  \"network\": \"tcp\",\n  \"security\": \"reality\",\n  \"externalProxy\": [\n    {\n      \"forceTls\": \"same\",\n      \"dest\": \"{{ item.region }}\",\n      \"port\": {{ item.port }},\n      \"remark\": \"\"\n    }\n  ],\n  \"realitySettings\": {\n    \"show\": false,\n    \"xver\": 0,\n    \"dest\": \"youtube.com:443\",\n    \"serverNames\": [\n      \"youtube.com\",\n      \"www.youtube.com\"\n    ],\n    \"privateKey\": \"{{ item.privateKey }}\",\n    \"minClient\": \"\",\n    \"maxClient\": \"\",\n    \"maxTimediff\": 0,\n    \"shortIds\": [\n      \"{{ item.shortID }}\"\n    ],\n    \"settings\": {\n      \"publicKey\": \"{{ item.publicKey }}\",\n      \"fingerprint\": \"chrome\",\n      \"serverName\": \"\",\n      \"spiderX\": \"/\"\n    }\n  },\n  \"tcpSettings\": {\n    \"acceptProxyProtocol\": false,\n    \"header\": {\n      \"type\": \"none\"\n    }\n  }\n}",
+  "tag": "inbound-{{ item.port }}",
+  "sniffing": "{\n  \"enabled\": true,\n  \"destOverride\": [\n    \"http\",\n    \"tls\",\n    \"quic\",\n    \"fakedns\"\n  ],\n  \"metadataOnly\": false,\n  \"routeOnly\": false\n}"
+}

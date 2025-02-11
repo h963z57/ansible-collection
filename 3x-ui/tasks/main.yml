@@ -1,0 +1,12 @@
+---
+# tasks file for 3x-ui
+- name         : Auth
+  include_tasks: auth.yaml
+
+- name         : Update or create inbound
+  include_tasks: inbound_manage.yaml
+  when: (UPDATE is defined and UPDATE == true) or (UPDATE is not defined)
+
+- name         : Get trafik status
+  include_tasks: get_statistic.yaml
+  when: (STATUS is defined and STATUS == true) or (STATUS is not defined)
