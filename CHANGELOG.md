@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.6.1] - 29-Apr-2025
+### Changed
+- 3x-ui SNI
+
 ## [2.6.0] - 11-Feb-2025
 ### Added
 - 3x-ui manage
